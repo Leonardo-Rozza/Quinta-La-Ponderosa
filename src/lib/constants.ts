@@ -1,0 +1,82 @@
+export const CONFIG = {
+  siteName: "La Ponderosa",
+  telefono: "+5491124050772",
+  telefonoDisplay: "+54 11 2405-0772",
+  email: "info@laponderosa.com.ar",
+  instagram: "@laponderosa",
+  instagramUrl: "https://instagram.com/laponderosa",
+  direccion: "José C. Paz · Buenos Aires",
+  whatsappMessage: "Hola! Me interesa hacer una reserva en La Ponderosa 🌿",
+} as const;
+
+export const PRECIOS = {
+  porDia: 250_000,        // $250.000 ARS
+  porcentajeSena: 0.5,    // 50%
+  maximoPersonas: 30,
+  horarioInicio: "10:00",
+  horarioFin: "20:00",
+
+  get sena() {
+    return this.porDia * this.porcentajeSena;
+  },
+} as const;
+
+export const NAV_LINKS = [
+  { href: "#servicios", label: "Servicios" },
+  { href: "#galeria", label: "Galería" },
+  { href: "#reservas", label: "Reservas" },
+  { href: "#contacto", label: "Contacto" },
+] as const;
+
+export const SERVICIOS = [
+  {
+    id: "pileta",
+    titulo: "Piscina",
+    descripcion: "Amplia piscina con zona de descanso y reposeras",
+    icono: "waves",
+  },
+  {
+    id: "parque",
+    titulo: "Parque Natural",
+    descripcion: "5 hectáreas de parque arbolado con senderos",
+    icono: "trees",
+  },
+  {
+    id: "quincho",
+    titulo: "Quincho Equipado",
+    descripcion: "Parrilla, horno de barro y cocina completa",
+    icono: "flame",
+  },
+  {
+    id: "wifi",
+    titulo: "WiFi Gratis",
+    descripcion: "Internet de alta velocidad en toda la propiedad",
+    icono: "wifi",
+  },
+  {
+    id: "estacionamiento",
+    titulo: "Estacionamiento",
+    descripcion: "Amplio espacio para varios vehículos",
+    icono: "car",
+  },
+  {
+    id: "capacidad",
+    titulo: "Hasta 30 Personas",
+    descripcion: "Espacio ideal para eventos y reuniones grandes",
+    icono: "users",
+  },
+] as const;
+
+// Fechas ocupadas mock (en producción viene de la BD)
+export const FECHAS_OCUPADAS_MOCK: Date[] = [
+  new Date(2026, 1, 7),
+  new Date(2026, 1, 8),
+  new Date(2026, 1, 14),
+  new Date(2026, 1, 15),
+  new Date(2026, 1, 21),
+  new Date(2026, 1, 22),
+  new Date(2026, 1, 28),
+  new Date(2026, 2, 1),
+  new Date(2026, 2, 7),
+  new Date(2026, 2, 8),
+];
