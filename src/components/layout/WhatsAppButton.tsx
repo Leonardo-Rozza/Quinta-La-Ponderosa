@@ -68,9 +68,6 @@ export function WhatsAppButton() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ICONO DE WHATSAPP
-// ─────────────────────────────────────────────────────────────────────────────
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg 

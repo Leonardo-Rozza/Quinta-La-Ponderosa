@@ -45,7 +45,7 @@ export function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://facebook.com/laponderosa"
+                href="https://www.facebook.com/profile.php?id=61553456481253"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer-social-btn"
@@ -66,21 +66,6 @@ export function Footer() {
           </div>
 
           {/* Columna 2: Links rápidos */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Enlaces</h4>
-            <ul className="space-y-3">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-terracota transition-colors text-sm"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
 
           {/* Columna 3: Contacto */}
           <div>

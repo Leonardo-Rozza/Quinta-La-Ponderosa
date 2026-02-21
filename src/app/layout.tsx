@@ -2,13 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { DM_Serif_Display, Source_Sans_3 } from "next/font/google";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FONTS
-// ─────────────────────────────────────────────────────────────────────────────
-// Configuramos las fuentes con next/font para optimización automática
-// La variable CSS que definimos acá (--font-dm-serif) la usamos en globals.css
-// ─────────────────────────────────────────────────────────────────────────────
-
 const dmSerifDisplay = DM_Serif_Display({
   weight: ["400"],
   subsets: ["latin"],
@@ -55,10 +48,6 @@ export default function RootLayout({
       lang="es" 
       className={`${dmSerifDisplay.variable} ${sourceSans.variable}`}
     >
-      {/* 
-        En Tailwind v4, las clases como bg-crema, text-negro, font-sans
-        funcionan porque las definimos en @theme dentro de globals.css
-      */}
       <body className="font-sans bg-crema text-negro antialiased overflow-x-hidden">
         {children}
       </body>

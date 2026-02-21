@@ -2,9 +2,9 @@ export const CONFIG = {
   siteName: "La Ponderosa",
   telefono: "+5491124050772",
   telefonoDisplay: "+54 11 2405-0772",
-  email: "info@laponderosa.com.ar",
+  email: "leonardorozza.dev@gmail.com",
   instagram: "@laponderosa",
-  instagramUrl: "https://instagram.com/laponderosa",
+  instagramUrl: "https://www.instagram.com/quintalaponderosa.jcp/",
   direccion: "José C. Paz · Buenos Aires",
   whatsappMessage: "Hola! Me interesa hacer una reserva en La Ponderosa 🌿",
 } as const;
