@@ -1,14 +1,13 @@
-"use client";
+// ═══════════════════════════════════════════════════════════════════════════════
+// Calendario.tsx - Componente visual del calendario
+// ═══════════════════════════════════════════════════════════════════════════════
+'use client';
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DiaInfo } from "@/hooks/useCalendario";
+import { DiaInfo } from '@/hooks/useCalendario';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Días de la semana
-const DIAS_SEMANA = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PROPS
-// ─────────────────────────────────────────────────────────────────────────────
 interface CalendarioProps {
   nombreMes: string;
   diasDelMes: Date[];
@@ -19,9 +18,6 @@ interface CalendarioProps {
   puedeIrAtras: boolean;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENTE
-// ─────────────────────────────────────────────────────────────────────────────
 export function Calendario({
   nombreMes,
   diasDelMes,
@@ -33,11 +29,8 @@ export function Calendario({
 }: CalendarioProps) {
   return (
     <div className="calendario-container">
-      {/* Header con navegación */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-serif text-xl sm:text-2xl text-negro capitalize">
-          {nombreMes}
-        </h3>
+        <h3 className="font-serif text-xl sm:text-2xl text-negro capitalize">{nombreMes}</h3>
         <div className="flex gap-2">
           <button
             onClick={onMesAnterior}
@@ -57,19 +50,14 @@ export function Calendario({
         </div>
       </div>
 
-      {/* Días de la semana */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {DIAS_SEMANA.map((dia) => (
-          <div
-            key={dia}
-            className="text-center text-xs sm:text-sm font-medium text-negro/50 py-2"
-          >
+          <div key={dia} className="text-center text-xs sm:text-sm font-medium text-negro/50 py-2">
             {dia}
           </div>
         ))}
       </div>
 
-      {/* Grid de días */}
       <div className="grid grid-cols-7 gap-1">
         {diasDelMes.map((fecha) => {
           const info = getDiaInfo(fecha);
@@ -83,7 +71,6 @@ export function Calendario({
         })}
       </div>
 
-      {/* Leyenda */}
       <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-negro/10">
         <div className="flex items-center gap-2 text-xs sm:text-sm">
           <span className="w-3 h-3 rounded-full bg-disponible" />
@@ -102,9 +89,6 @@ export function Calendario({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENTE CELDA DE DÍA
-// ─────────────────────────────────────────────────────────────────────────────
 interface DiaCeldaProps {
   info: DiaInfo;
   onClick: () => void;
@@ -113,26 +97,24 @@ interface DiaCeldaProps {
 function DiaCelda({ info, onClick }: DiaCeldaProps) {
   const { fecha, esMesActual, esOcupado, esPasado, esSeleccionado, esHoy } = info;
 
-  // Determinar si está deshabilitado
   const deshabilitado = esOcupado || esPasado || !esMesActual;
 
-  // Construir clases CSS
-  let clases = "calendario-dia";
+  let clases = 'calendario-dia';
 
   if (!esMesActual) {
-    clases += " calendario-dia-otro-mes";
+    clases += ' calendario-dia-otro-mes';
   } else if (esOcupado) {
-    clases += " calendario-dia-ocupado";
+    clases += ' calendario-dia-ocupado';
   } else if (esPasado) {
-    clases += " calendario-dia-pasado";
+    clases += ' calendario-dia-pasado';
   } else if (esSeleccionado) {
-    clases += " calendario-dia-seleccionado";
+    clases += ' calendario-dia-seleccionado';
   } else {
-    clases += " calendario-dia-disponible";
+    clases += ' calendario-dia-disponible';
   }
 
   if (esHoy && esMesActual) {
-    clases += " calendario-dia-hoy";
+    clases += ' calendario-dia-hoy';
   }
 
   return (
@@ -140,7 +122,7 @@ function DiaCelda({ info, onClick }: DiaCeldaProps) {
       onClick={onClick}
       disabled={deshabilitado}
       className={clases}
-      aria-label={`${fecha.getDate()} ${esOcupado ? "(ocupado)" : ""}`}
+      aria-label={`${fecha.getDate()} ${esOcupado ? '(ocupado)' : ''}`}
     >
       {fecha.getDate()}
     </button>

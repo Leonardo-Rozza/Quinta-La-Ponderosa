@@ -1,68 +1,87 @@
-"use client";
+// ═══════════════════════════════════════════════════════════════════════════════
+// Reservas/index.tsx - Sección completa de reservas
+// ═══════════════════════════════════════════════════════════════════════════════
+'use client';
 
-import { useState } from "react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { Calendar, CreditCard, Clock } from "lucide-react";
-import { useCalendario } from "@/hooks/useCalendario";
-import { Calendario } from "./Calendario";
-import { FormReserva, DatosReserva } from "./FormReserva";
-import { PRECIOS, FECHAS_OCUPADAS_MOCK } from "@/lib/constants";
-import { formatearPrecio } from "@/lib/utils";
+import { useCalendario } from '@/hooks/useCalendario';
+import { PRECIOS } from '@/lib/constants';
+import { formatearPrecio } from '@/lib/utils';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Calendar, Clock, CreditCard, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Calendario } from './Calendario';
+import { DatosReserva, FormReserva } from './FormReserva';
 
 export function Reservas() {
-  // Hook del calendario
+  const [fechasOcupadas, setFechasOcupadas] = useState<Date[]>([]);
+  const [cargandoFechas, setCargandoFechas] = useState(true);
+
   const calendario = useCalendario({
-    fechasOcupadas: FECHAS_OCUPADAS_MOCK, // En producción, esto viene del backend
+    fechasOcupadas,
   });
 
-  // Estado para el proceso de pago
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Handler del formulario
-  // ─────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    async function cargarFechasOcupadas() {
+      try {
+        const response = await fetch('/api/reservas');
+        const data = await response.json();
+
+        if (data.fechasOcupadas) {
+          const fechas = data.fechasOcupadas.map((f: string) => new Date(f + 'T12:00:00'));
+          setFechasOcupadas(fechas);
+        }
+      } catch (err) {
+        console.error('Error cargando fechas:', err);
+      } finally {
+        setCargandoFechas(false);
+      }
+    }
+
+    cargarFechasOcupadas();
+  }, []);
+
   const handleSubmit = async (datos: DatosReserva) => {
     if (!calendario.fechaSeleccionada) {
-      alert("Por favor seleccioná una fecha");
+      setError('Por favor seleccioná una fecha');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
-      // Preparar datos para el backend
-      const reservaData = {
-        ...datos,
-        fecha: calendario.fechaSeleccionada.toISOString(),
-        precioTotal: PRECIOS.porDia,
-        montoSena: PRECIOS.porDia * PRECIOS.porcentajeSena,
-      };
+      const fechaFormateada = format(calendario.fechaSeleccionada, 'yyyy-MM-dd');
 
-      console.log("Datos de reserva:", reservaData);
+      const response = await fetch('/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...datos,
+          fecha: fechaFormateada,
+        }),
+      });
 
-      // TODO: Llamar a la API para crear la reserva y obtener el link de MercadoPago
-      // const response = await fetch("/api/reservas", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(reservaData),
-      // });
-      // const { mercadoPagoUrl } = await response.json();
-      // window.location.href = mercadoPagoUrl;
+      const data = await response.json();
 
-      // Por ahora, simular el proceso
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert(
-        `¡Reserva simulada!\n\n` +
-          `Fecha: ${format(calendario.fechaSeleccionada, "EEEE d 'de' MMMM", { locale: es })}\n` +
-          `Personas: ${datos.cantidadPersonas}\n` +
-          `Seña: ${formatearPrecio(PRECIOS.porDia * PRECIOS.porcentajeSena)}\n\n` +
-          `En producción, acá se redirigiría a MercadoPago.`
-      );
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Hubo un error al procesar la reserva. Intentá de nuevo.");
-    } finally {
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear la reserva');
+      }
+
+      const checkoutUrl =
+        process.env.NODE_ENV === 'development' ? data.sandboxUrl : data.checkoutUrl;
+
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error('No se recibió URL de pago');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err instanceof Error ? err.message : 'Error al procesar la reserva');
       setIsLoading(false);
     }
   };
@@ -70,7 +89,6 @@ export function Reservas() {
   return (
     <section id="reservas" className="py-16 sm:py-20 lg:py-24 bg-blanco">
       <div className="section-container">
-        {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
           <span className="section-label">Reservas</span>
           <h2 className="section-title mb-4">Reservá tu día</h2>
@@ -79,11 +97,8 @@ export function Reservas() {
           </p>
         </div>
 
-        {/* Contenido principal: 2 columnas */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Columna izquierda: Info + Calendario */}
           <div className="space-y-6">
-            {/* Card de precio */}
             <div className="precio-card">
               <div className="flex items-start justify-between">
                 <div>
@@ -99,12 +114,13 @@ export function Reservas() {
                   </p>
                 </div>
               </div>
-              
-              {/* Info adicional */}
+
               <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2 text-white/80 text-sm">
                   <Clock className="w-4 h-4" />
-                  <span>{PRECIOS.horarioInicio} a {PRECIOS.horarioFin} hs</span>
+                  <span>
+                    {PRECIOS.horarioInicio} a {PRECIOS.horarioFin} hs
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80 text-sm">
                   <Calendar className="w-4 h-4" />
@@ -113,21 +129,27 @@ export function Reservas() {
               </div>
             </div>
 
-            {/* Calendario */}
-            <Calendario
-              nombreMes={calendario.nombreMes}
-              diasDelMes={calendario.diasDelMes}
-              getDiaInfo={calendario.getDiaInfo}
-              onSeleccionarDia={calendario.seleccionarDia}
-              onMesAnterior={calendario.irMesAnterior}
-              onMesSiguiente={calendario.irMesSiguiente}
-              puedeIrAtras={calendario.puedeIrAtras}
-            />
+            {cargandoFechas ? (
+              <div className="calendario-container flex items-center justify-center min-h-[300px]">
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 text-terracota animate-spin mx-auto mb-2" />
+                  <p className="text-negro/60 text-sm">Cargando disponibilidad...</p>
+                </div>
+              </div>
+            ) : (
+              <Calendario
+                nombreMes={calendario.nombreMes}
+                diasDelMes={calendario.diasDelMes}
+                getDiaInfo={calendario.getDiaInfo}
+                onSeleccionarDia={calendario.seleccionarDia}
+                onMesAnterior={calendario.irMesAnterior}
+                onMesSiguiente={calendario.irMesSiguiente}
+                puedeIrAtras={calendario.puedeIrAtras}
+              />
+            )}
           </div>
 
-          {/* Columna derecha: Formulario */}
           <div>
-            {/* Fecha seleccionada */}
             {calendario.fechaSeleccionada ? (
               <div className="fecha-seleccionada-card mb-6">
                 <div className="flex items-center gap-3">
@@ -158,18 +180,17 @@ export function Reservas() {
               </div>
             )}
 
-            {/* Formulario */}
+            {error && (
+              <div className="bg-ocupado/10 border border-ocupado/20 rounded-xl p-4 mb-6">
+                <p className="text-ocupado text-sm">{error}</p>
+              </div>
+            )}
+
             <div className="form-container">
-              <h3 className="font-serif text-xl text-negro mb-6">
-                Datos de contacto
-              </h3>
-              <FormReserva
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-              />
+              <h3 className="font-serif text-xl text-negro mb-6">Datos de contacto</h3>
+              <FormReserva onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
 
-            {/* Resumen del pago */}
             {calendario.fechaSeleccionada && (
               <div className="resumen-pago mt-6">
                 <div className="flex items-center gap-2 mb-4">
