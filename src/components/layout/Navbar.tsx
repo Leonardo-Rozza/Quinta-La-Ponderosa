@@ -54,8 +54,6 @@ export function Navbar() {
         )}
       >
         <div className="section-container flex justify-between items-center h-16 md:h-20">
-          {/* Logo */}
-          {/* Logo */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 z-10"
