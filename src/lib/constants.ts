@@ -69,15 +69,4 @@ export const SERVICIOS = [
 ] as const;
 
 // Fechas ocupadas mock (en producción viene de la BD)
-export const FECHAS_OCUPADAS_MOCK: Date[] = [
-  new Date(2026, 1, 7),
-  new Date(2026, 1, 8),
-  new Date(2026, 1, 14),
-  new Date(2026, 1, 15),
-  new Date(2026, 1, 21),
-  new Date(2026, 1, 22),
-  new Date(2026, 1, 28),
-  new Date(2026, 2, 1),
-  new Date(2026, 2, 7),
-  new Date(2026, 2, 8),
-];
+export const FECHAS_OCUPADAS_MOCK: Date[] = [];
