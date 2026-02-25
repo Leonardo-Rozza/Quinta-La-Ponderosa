@@ -6,7 +6,7 @@ export const CONFIG = {
   instagram: '@laponderosa',
   instagramUrl: 'https://www.instagram.com/quintalaponderosa.jcp/',
   direccion: 'José C. Paz · Buenos Aires',
-  whatsappMessage: 'Hola! Me interesa hacer una reserva en La Ponderosa 🌿',
+  whatsappMessage: 'Hola! Me interesa hacer una reserva en La Ponderosa!',
 } as const;
 
 export const PRECIOS = {
@@ -39,7 +39,7 @@ export const SERVICIOS = [
   {
     id: 'parque',
     titulo: 'Parque Natural',
-    descripcion: '5 hectáreas de parque arbolado con senderos',
+    descripcion: 'Parque arbolado',
     icono: 'trees',
   },
   {

@@ -6,7 +6,7 @@ import { CONFIG } from "@/lib/constants";
 export function Hero() {
   return (
     <section className="relative min-h-screen w-full overflow-hidden">
-      
+
       {/* Imagen de fondo */}
       <Image
         src="/images/hero.jpeg"  // Cambiá a .webp si tu imagen es webp
@@ -24,13 +24,13 @@ export function Hero() {
       {/* Contenido */}
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
-          
+
           {/* Badge de ubicación */}
-          <div 
+          <div
             className="
               mb-4 sm:mb-6
               inline-flex items-center gap-2
-              rounded-full 
+              rounded-full
               bg-white/10 backdrop-blur-sm
               px-4 py-2
               text-white/90 text-sm
@@ -42,7 +42,7 @@ export function Hero() {
           </div>
 
           {/* Título principal */}
-          <h1 
+          <h1
             className="
               font-serif text-white
               text-4xl sm:text-5xl md:text-6xl lg:text-7xl
@@ -58,7 +58,7 @@ export function Hero() {
           </h1>
 
           {/* Descripción */}
-          <p 
+          <p
             className="
               text-white/80
               text-base sm:text-lg lg:text-xl
@@ -69,13 +69,13 @@ export function Hero() {
             "
             style={{ animationDelay: "0.2s", animationFillMode: "backwards" }}
           >
-            Desconectate de la ciudad en nuestra quinta de 5 hectáreas. 
-            Perfecta para familias y grupos de amigos que buscan tranquilidad, 
+            Desconectate de la ciudad en nuestra quinta.
+            Perfecta para familias y grupos de amigos que buscan tranquilidad,
             naturaleza y momentos inolvidables.
           </p>
 
           {/* Botones */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up"
             style={{ animationDelay: "0.3s", animationFillMode: "backwards" }}
           >
