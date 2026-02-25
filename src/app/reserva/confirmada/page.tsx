@@ -23,19 +23,19 @@ export default function ReservaConfirmada() {
           <h2 className="font-semibold text-negro mb-4">Próximos pasos</h2>
           <ul className="space-y-3 text-sm text-negro/70">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-terracota text-xs font-bold">1</span>
               </span>
               <span>Revisá tu email para ver los detalles completos</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-terracota text-xs font-bold">2</span>
               </span>
               <span>Te contactaremos para coordinar los detalles de tu llegada</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="w-6 h-6 bg-terracota/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-terracota text-xs font-bold">3</span>
               </span>
               <span>El día del evento, aboná el resto en efectivo o transferencia</span>

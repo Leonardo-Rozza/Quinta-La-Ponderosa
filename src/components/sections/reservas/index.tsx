@@ -71,8 +71,7 @@ export function Reservas() {
         throw new Error(data.error || 'Error al crear la reserva');
       }
 
-      const checkoutUrl =
-        process.env.NODE_ENV === 'development' ? data.sandboxUrl : data.checkoutUrl;
+      const checkoutUrl = data.checkoutUrl || data.sandboxUrl;
 
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
@@ -130,7 +129,7 @@ export function Reservas() {
             </div>
 
             {cargandoFechas ? (
-              <div className="calendario-container flex items-center justify-center min-h-[300px]">
+              <div className="calendario-container flex items-center justify-center min-h-75">
                 <div className="text-center">
                   <Loader2 className="w-8 h-8 text-terracota animate-spin mx-auto mb-2" />
                   <p className="text-negro/60 text-sm">Cargando disponibilidad...</p>

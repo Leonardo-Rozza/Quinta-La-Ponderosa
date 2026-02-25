@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ Reserva creada en Supabase:', reserva.id);
 
     // Crear preferencia de MercadoPago
-    const siteUrl = 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     const preference = new Preference(mpClient);
 
