@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// /api/reservas/route.ts - Crear reserva y generar link de MercadoPago
-// ═══════════════════════════════════════════════════════════════════════════════
 import { PRECIOS } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
@@ -18,14 +15,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { nombreCompleto, email, telefono, fecha, cantidadPersonas, comentarios } = body;
-
-    console.log('📝 Datos recibidos:', {
-      nombreCompleto,
-      email,
-      telefono,
-      fecha,
-      cantidadPersonas,
-    });
 
     if (!nombreCompleto || !email || !telefono || !fecha || !cantidadPersonas) {
       return NextResponse.json({ error: 'Faltan datos requeridos' }, { status: 400 });
@@ -50,8 +39,6 @@ export async function POST(request: NextRequest) {
     const precioTotal = PRECIOS.porDia;
     const montoSena = Math.round(precioTotal * PRECIOS.porcentajeSena);
 
-    console.log('💰 Precios:', { precioTotal, montoSena });
-
     // Crear reserva en Supabase
     const { data: reserva, error: errorReserva } = await supabaseAdmin
       .from('reservas')
@@ -70,11 +57,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (errorReserva) {
-      console.error('❌ Error creando reserva en Supabase:', errorReserva);
       return NextResponse.json({ error: 'Error al crear la reserva' }, { status: 500 });
     }
-
-    console.log('✅ Reserva creada en Supabase:', reserva.id);
 
     // Crear preferencia de MercadoPago
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -107,9 +91,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('✅ Preferencia MP creada:', mpPreference.id);
-    console.log('🔗 URL de pago:', mpPreference.init_point);
-
     // Actualizar reserva con preference ID
     await supabaseAdmin
       .from('reservas')
@@ -123,7 +104,6 @@ export async function POST(request: NextRequest) {
       sandboxUrl: mpPreference.sandbox_init_point,
     });
   } catch (error) {
-    console.error('❌ Error en POST /api/reservas:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -139,7 +119,6 @@ export async function GET() {
       .eq('estado', 'confirmada');
 
     if (error) {
-      console.error('Error obteniendo fechas:', error);
       return NextResponse.json({ error: 'Error al obtener fechas' }, { status: 500 });
     }
 
@@ -147,7 +126,6 @@ export async function GET() {
 
     return NextResponse.json({ fechasOcupadas });
   } catch (error) {
-    console.error('Error en GET /api/reservas:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

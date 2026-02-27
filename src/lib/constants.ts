@@ -10,7 +10,7 @@ export const CONFIG = {
 } as const;
 
 export const PRECIOS = {
-  porDia: 250_000, // $250.000 ARS
+  porDia: 300_000,
   porcentajeSena: 0.5, // 50%
   maximoPersonas: 30,
   horarioInicio: '10:00',

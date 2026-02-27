@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// /reserva/pendiente/page.tsx - Pago en proceso
-// ═══════════════════════════════════════════════════════════════════════════════
 import { CONFIG } from '@/lib/constants';
 import { ArrowLeft, Clock, Phone } from 'lucide-react';
 import Link from 'next/link';

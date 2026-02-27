@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// /reserva/error/page.tsx - Error en el pago
-// ═══════════════════════════════════════════════════════════════════════════════
 import { CONFIG } from '@/lib/constants';
 import { Phone, RefreshCw, XCircle } from 'lucide-react';
 import Link from 'next/link';

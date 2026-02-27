@@ -28,8 +28,8 @@ export function Footer() {
               <span className="font-serif text-xl">{CONFIG.siteName}</span>
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-6">
-              Tu refugio en la naturaleza. 5 hectáreas de parque, pileta y quincho equipado para
-              disfrutar con familia y amigos.
+              Tu refugio en la naturaleza. Pileta y quincho equipado para disfrutar con familia y
+              amigos.
             </p>
 
             {/* Redes sociales */}
@@ -97,7 +97,6 @@ export function Footer() {
             </ul>
           </div>
 
-          
           <div>
             <h4 className="font-semibold text-white mb-4">Horarios</h4>
             <div className="space-y-3 text-sm">

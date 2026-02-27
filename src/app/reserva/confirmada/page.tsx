@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// /reserva/confirmada/page.tsx - Página de éxito
-// ═══════════════════════════════════════════════════════════════════════════════
 import { CONFIG } from '@/lib/constants';
 import { ArrowLeft, CheckCircle, Phone } from 'lucide-react';
 import Link from 'next/link';

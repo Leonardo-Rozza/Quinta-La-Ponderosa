@@ -1,15 +1,13 @@
-import Image from "next/image";
-import Link from "next/link";
-import { MapPin } from "lucide-react";
-import { CONFIG } from "@/lib/constants";
+import { CONFIG } from '@/lib/constants';
+import { MapPin } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export function Hero() {
   return (
     <section className="relative min-h-screen w-full overflow-hidden">
-
-      {/* Imagen de fondo */}
       <Image
-        src="/images/hero.jpeg"  // Cambiá a .webp si tu imagen es webp
+        src="/images/hero.jpeg"
         alt="Vista del parque de La Ponderosa"
         fill
         priority
@@ -19,13 +17,10 @@ export function Hero() {
       />
 
       {/* Overlay oscuro con gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-black/30" />
 
-      {/* Contenido */}
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
-
-          {/* Badge de ubicación */}
           <div
             className="
               mb-4 sm:mb-6
@@ -41,7 +36,6 @@ export function Hero() {
             <span>{CONFIG.direccion}</span>
           </div>
 
-          {/* Título principal */}
           <h1
             className="
               font-serif text-white
@@ -51,13 +45,11 @@ export function Hero() {
               mb-4 sm:mb-6
               animate-fade-in-up
             "
-            style={{ animationDelay: "0.1s", animationFillMode: "backwards" }}
+            style={{ animationDelay: '0.1s', animationFillMode: 'backwards' }}
           >
-            Tu refugio en la{" "}
-            <span className="text-terracota italic">naturaleza</span>
+            Tu refugio en la <span className="text-terracota italic">naturaleza</span>
           </h1>
 
-          {/* Descripción */}
           <p
             className="
               text-white/80
@@ -67,17 +59,15 @@ export function Hero() {
               mb-6 sm:mb-8
               animate-fade-in-up
             "
-            style={{ animationDelay: "0.2s", animationFillMode: "backwards" }}
+            style={{ animationDelay: '0.2s', animationFillMode: 'backwards' }}
           >
-            Desconectate de la ciudad en nuestra quinta.
-            Perfecta para familias y grupos de amigos que buscan tranquilidad,
-            naturaleza y momentos inolvidables.
+            Desconectate de la ciudad en nuestra quinta. Perfecta para familias y grupos de amigos
+            que buscan tranquilidad, naturaleza y momentos inolvidables.
           </p>
 
-          {/* Botones */}
           <div
             className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up"
-            style={{ animationDelay: "0.3s", animationFillMode: "backwards" }}
+            style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}
           >
             <Link href="#reservas" className="btn-primary">
               Ver Disponibilidad
