@@ -21,8 +21,6 @@ export function Navbar() {
     document.body.style.overflow = isMenuOpen ? 'hidden' : '';
   }, [isMenuOpen]);
 
-  const handleLinkClick = () => setIsMenuOpen(false);
-
   // ─────────────────────────────────────────────────────────────────────────
   // FUNCIÓN PARA SCROLL SUAVE A UNA SECCIÓN
   // ─────────────────────────────────────────────────────────────────────────

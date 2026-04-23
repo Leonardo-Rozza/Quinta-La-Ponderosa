@@ -9,9 +9,9 @@ export function Footer() {
     <footer id="contacto" className="bg-negro text-white">
       {/* Contenido principal */}
       <div className="section-container py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
           {/* Columna 1: Logo y descripción */}
-          <div className="sm:col-span-2 lg:col-span-1">
+          <div className="sm:col-span-2 lg:col-span-1 lg:max-w-sm">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-full bg-oliva flex items-center justify-center">
                 <svg
@@ -67,7 +67,7 @@ export function Footer() {
           {/* Columna 2: Links rápidos */}
 
           {/* Columna 3: Contacto */}
-          <div>
+          <div className="sm:max-w-xs">
             <h4 className="font-semibold text-white mb-4">Contacto</h4>
             <ul className="space-y-3">
               <li>
@@ -97,7 +97,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="sm:max-w-xs lg:justify-self-end">
             <h4 className="font-semibold text-white mb-4">Horarios</h4>
             <div className="space-y-3 text-sm">
               <div>

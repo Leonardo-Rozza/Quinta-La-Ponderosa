@@ -68,5 +68,26 @@ export const SERVICIOS = [
   },
 ] as const;
 
-// Fechas ocupadas mock (en producción viene de la BD)
-export const FECHAS_OCUPADAS_MOCK: Date[] = [];
+// Fechas bloqueadas manualmente.
+// Usá formato YYYY-MM-DD. Ejemplo: '2026-12-25'
+// Cargá acá las fechas reservadas por otros canales para que el calendario las marque ocupadas.
+export const FECHAS_BLOQUEADAS_MANUALES = [
+  // '2026-12-25',
+  // '2026-12-31',
+] as const;
+
+const FECHA_MANUAL_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+export function obtenerFechasBloqueadasManuales(): string[] {
+  return [...new Set(FECHAS_BLOQUEADAS_MANUALES)]
+    .filter((fecha) => {
+      const esValida = FECHA_MANUAL_REGEX.test(fecha);
+
+      if (!esValida) {
+        console.warn(`Fecha manual ignorada por formato inválido: ${fecha}`);
+      }
+
+      return esValida;
+    })
+    .sort();
+}
