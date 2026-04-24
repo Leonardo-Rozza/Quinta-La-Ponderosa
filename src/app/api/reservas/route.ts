@@ -1,5 +1,5 @@
 import { PRECIOS, obtenerFechasBloqueadasManuales } from '@/lib/constants';
-import { getSupabaseAdmin, type Reserva } from '@/lib/supabase';
+import { getSupabaseAdmin, hasSupabaseAdminConfig, type Reserva } from '@/lib/supabase';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -44,6 +44,13 @@ function isPendingReservaActive(creadoEn: string | null) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
+    if (!hasSupabaseAdminConfig()) {
+      return NextResponse.json(
+        { error: 'Falta configurar Supabase para registrar reservas' },
+        { status: 503 }
+      );
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     const body = await request.json();
     const { nombreCompleto, email, telefono, fecha, cantidadPersonas, comentarios } = body;
@@ -209,7 +216,8 @@ export async function POST(request: NextRequest) {
       checkoutUrl: mpPreference.init_point,
       sandboxUrl: mpPreference.sandbox_init_point,
     });
-  } catch {
+  } catch (error) {
+    console.error('Error en POST /api/reservas:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -219,8 +227,16 @@ export async function POST(request: NextRequest) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function GET() {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
     const fechasBloqueadasManuales = obtenerFechasBloqueadasManuales();
+
+    if (!hasSupabaseAdminConfig()) {
+      return NextResponse.json({
+        fechasOcupadas: fechasBloqueadasManuales,
+        warning: 'Supabase no está configurado; se muestran solo fechas manuales',
+      });
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('reservas')
       .select('fecha, estado, creado_en')
@@ -243,7 +259,8 @@ export async function GET() {
     const fechasOcupadas = [...new Set([...fechasOcupadasDb, ...fechasBloqueadasManuales])].sort();
 
     return NextResponse.json({ fechasOcupadas });
-  } catch {
+  } catch (error) {
+    console.error('Error en GET /api/reservas:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

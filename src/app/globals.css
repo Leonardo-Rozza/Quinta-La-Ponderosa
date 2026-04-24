@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════════
-   GLOBALS.CSS - Tailwind v4 (CORREGIDO)
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    @THEME - Configuración del tema personalizado
@@ -11,22 +7,22 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      COLORES
      ═══════════════════════════════════════════════════════════════════════════ */
-  
-  --color-crema: #F5F0E8;
-  --color-crema-dark: #EBE4D8;
-  
-  --color-terracota: #C17F59;
-  --color-terracota-dark: #A66B48;
-  --color-terracota-light: #D4A484;
-  
-  --color-oliva: #5C6B4A;
-  --color-oliva-light: #7A8B66;
-  
-  --color-negro: #2C2C2C;
-  --color-blanco: #FFFEF9;
-  
-  --color-disponible: #6B9B5E;
-  --color-ocupado: #D4534B;
+
+  --color-crema: #f5f0e8;
+  --color-crema-dark: #ebe4d8;
+
+  --color-terracota: #c17f59;
+  --color-terracota-dark: #a66b48;
+  --color-terracota-light: #d4a484;
+
+  --color-oliva: #5c6b4a;
+  --color-oliva-light: #7a8b66;
+
+  --color-negro: #2c2c2c;
+  --color-blanco: #fffef9;
+
+  --color-disponible: #6b9b5e;
+  --color-ocupado: #d4534b;
 
   /* ═══════════════════════════════════════════════════════════════════════════
      FUENTES
@@ -45,40 +41,44 @@
    KEYFRAMES - Definidos fuera de @theme
    ───────────────────────────────────────────────────────────────────────────── */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in-up {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes fade-in-down {
-  from { 
-    opacity: 0; 
-    transform: translateY(-20px); 
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes slide-in-right {
-  from { 
-    opacity: 0; 
-    transform: translateX(50px); 
+  from {
+    opacity: 0;
+    transform: translateX(50px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateX(0); 
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -113,25 +113,25 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #F5F0E8;
+  background: #f5f0e8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C17F59;
+  background: #c17f59;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A66B48;
+  background: #a66b48;
 }
 
 ::selection {
-  background: #C17F59;
+  background: #c17f59;
   color: white;
 }
 
 *:focus-visible {
-  outline: 2px solid #C17F59;
+  outline: 2px solid #c17f59;
   outline-offset: 2px;
 }
 
@@ -173,7 +173,7 @@ img {
   font-family: var(--font-dm-serif), Georgia, serif;
   font-size: 1.875rem;
   line-height: 2.25rem;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 @media (min-width: 640px) {
@@ -193,7 +193,7 @@ img {
 /* Etiqueta encima del título */
 .section-label {
   display: inline-block;
-  color: #C17F59;
+  color: #c17f59;
   font-weight: 600;
   font-size: 0.75rem;
   letter-spacing: 0.1em;
@@ -214,7 +214,7 @@ img {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: #C17F59;
+  background-color: #c17f59;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
@@ -234,7 +234,7 @@ img {
 }
 
 .btn-primary:hover {
-  background-color: #A66B48;
+  background-color: #a66b48;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
@@ -250,8 +250,8 @@ img {
   justify-content: center;
   gap: 0.5rem;
   background-color: transparent;
-  color: #2C2C2C;
-  border: 2px solid #2C2C2C;
+  color: #2c2c2c;
+  border: 2px solid #2c2c2c;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-weight: 500;
@@ -269,7 +269,7 @@ img {
 }
 
 .btn-secondary:hover {
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
   color: white;
 }
 
@@ -279,7 +279,7 @@ img {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: #5C6B4A;
+  background-color: #5c6b4a;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
@@ -299,14 +299,14 @@ img {
 }
 
 .btn-oliva:hover {
-  background-color: #7A8B66;
+  background-color: #7a8b66;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
 /* Card base */
 .card {
-  background-color: #FFFEF9;
+  background-color: #fffef9;
   border-radius: 1rem;
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -334,13 +334,13 @@ img {
 }
 
 .hover-line::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -2px;
   left: 0;
   width: 0;
   height: 2px;
-  background: #C17F59;
+  background: #c17f59;
   transition: width 0.3s ease;
 }
 
@@ -363,7 +363,7 @@ img {
    ───────────────────────────────────────────────────────────────────────────── */
 .servicio-card {
   position: relative;
-  background-color: #EBE4D8;
+  background-color: #ebe4d8;
   border-radius: 1rem;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -381,7 +381,7 @@ img {
   left: 0;
   width: 100%;
   height: 4px;
-  background-color: #C17F59;
+  background-color: #c17f59;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -395,7 +395,7 @@ img {
 .servicio-icon {
   width: 3.5rem;
   height: 3.5rem;
-  background-color: #F5F0E8;
+  background-color: #f5f0e8;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -405,7 +405,7 @@ img {
 }
 
 .servicio-card:hover .servicio-icon {
-  background-color: #5C6B4A;
+  background-color: #5c6b4a;
 }
 
 .servicio-card:hover .servicio-icon svg {
@@ -416,7 +416,7 @@ img {
    TESTIMONIOS - Cards
    ───────────────────────────────────────────────────────────────────────────── */
 .testimonio-card {
-  background-color: #FFFEF9;
+  background-color: #fffef9;
   border-radius: 1rem;
   padding: 1.5rem;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -450,7 +450,7 @@ img {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 250px;
   }
-  
+
   /* Primera imagen más grande */
   .galeria-item-1 {
     grid-column: span 2;
@@ -465,7 +465,7 @@ img {
     grid-template-rows: repeat(2, 220px);
     gap: 1.25rem;
   }
-  
+
   /* Primera imagen ocupa 2 filas */
   .galeria-item-1 {
     grid-column: span 1;
@@ -509,7 +509,7 @@ img {
   height: 300px;
   border-radius: 1.5rem;
   overflow: hidden;
-  background-color: #EBE4D8;
+  background-color: #ebe4d8;
 }
 
 @media (min-width: 640px) {
@@ -525,12 +525,11 @@ img {
   }
 }
 
-
 /* ─────────────────────────────────────────────────────────────────────────────
    CALENDARIO
    ───────────────────────────────────────────────────────────────────────────── */
 .calendario-container {
-  background-color: #EBE4D8;
+  background-color: #ebe4d8;
   border-radius: 1.5rem;
   padding: 1.5rem;
 }
@@ -549,15 +548,15 @@ img {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #FFFEF9;
-  color: #2C2C2C;
+  background-color: #fffef9;
+  color: #2c2c2c;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .calendario-nav-btn:hover:not(:disabled) {
-  background-color: #C17F59;
+  background-color: #c17f59;
   color: white;
 }
 
@@ -595,8 +594,8 @@ img {
 
 /* Día disponible */
 .calendario-dia-disponible {
-  background-color: #FFFEF9;
-  color: #2C2C2C;
+  background-color: #fffef9;
+  color: #2c2c2c;
 }
 
 .calendario-dia-disponible:hover {
@@ -606,7 +605,7 @@ img {
 
 /* Día ocupado */
 .calendario-dia-ocupado {
-  background-color: #D4534B;
+  background-color: #d4534b;
   color: white;
   cursor: not-allowed;
 }
@@ -620,7 +619,7 @@ img {
 
 /* Día seleccionado */
 .calendario-dia-seleccionado {
-  background-color: #C17F59;
+  background-color: #c17f59;
   color: white;
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(193, 127, 89, 0.4);
@@ -628,14 +627,14 @@ img {
 
 /* Día de hoy */
 .calendario-dia-hoy {
-  box-shadow: inset 0 0 0 2px #C17F59;
+  box-shadow: inset 0 0 0 2px #c17f59;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    CARD DE PRECIO
    ───────────────────────────────────────────────────────────────────────────── */
 .precio-card {
-  background: linear-gradient(135deg, #5C6B4A 0%, #7A8B66 100%);
+  background: linear-gradient(135deg, #5c6b4a 0%, #7a8b66 100%);
   border-radius: 1.5rem;
   padding: 1.5rem;
 }
@@ -650,8 +649,8 @@ img {
    FECHA SELECCIONADA
    ───────────────────────────────────────────────────────────────────────────── */
 .fecha-seleccionada-card {
-  background-color: #F5F0E8;
-  border: 2px solid #EBE4D8;
+  background-color: #f5f0e8;
+  border: 2px solid #ebe4d8;
   border-radius: 1rem;
   padding: 1rem;
 }
@@ -666,7 +665,7 @@ img {
    FORMULARIO
    ───────────────────────────────────────────────────────────────────────────── */
 .form-container {
-  background-color: #F5F0E8;
+  background-color: #f5f0e8;
   border-radius: 1.5rem;
   padding: 1.5rem;
 }
@@ -686,7 +685,7 @@ img {
 .form-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 .form-input {
@@ -694,15 +693,15 @@ img {
   padding: 0.875rem 1rem;
   border: 2px solid transparent;
   border-radius: 0.75rem;
-  background-color: #FFFEF9;
+  background-color: #fffef9;
   font-size: 1rem;
-  color: #2C2C2C;
+  color: #2c2c2c;
   transition: all 0.2s ease;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #C17F59;
+  border-color: #c17f59;
 }
 
 .form-input::placeholder {
@@ -710,12 +709,12 @@ img {
 }
 
 .form-input-error {
-  border-color: #D4534B;
+  border-color: #d4534b;
 }
 
 .form-error {
   font-size: 0.75rem;
-  color: #D4534B;
+  color: #d4534b;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -728,7 +727,7 @@ img {
   gap: 0.75rem;
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: #009EE3;
+  background-color: #009ee3;
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -739,7 +738,7 @@ img {
 }
 
 .btn-mercadopago:hover:not(:disabled) {
-  background-color: #007EB5;
+  background-color: #007eb5;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 158, 227, 0.3);
 }
@@ -770,11 +769,10 @@ img {
    RESUMEN DE PAGO
    ───────────────────────────────────────────────────────────────────────────── */
 .resumen-pago {
-  background-color: #F5F0E8;
+  background-color: #f5f0e8;
   border-radius: 1rem;
   padding: 1.25rem;
 }
-
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    ESTILOS FOOTER Y WHATSAPP
@@ -797,7 +795,7 @@ img {
 }
 
 .footer-social-btn:hover {
-  background-color: #C17F59;
+  background-color: #c17f59;
   transform: translateY(-3px);
 }
 
@@ -814,7 +812,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #25D366;
+  background-color: #25d366;
   color: white;
   border-radius: 50%;
   box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
@@ -849,7 +847,7 @@ img {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background-color: #25D366;
+  background-color: #25d366;
   animation: whatsapp-pulse 2s ease-out infinite;
   z-index: -1;
 }
@@ -898,7 +896,7 @@ img {
 
 /* Flechita del tooltip */
 .whatsapp-tooltip::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -6px;
   right: 1.5rem;
