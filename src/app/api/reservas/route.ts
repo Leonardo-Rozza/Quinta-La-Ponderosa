@@ -1,5 +1,6 @@
 import { PRECIOS, obtenerFechasBloqueadasManuales } from '@/lib/constants';
 import { getSupabaseAdmin, hasSupabaseAdminConfig, type Reserva } from '@/lib/supabase';
+import { reservaInputSchema } from '@/lib/validations';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -52,13 +53,19 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin();
-    const body = await request.json();
-    const { nombreCompleto, email, telefono, fecha, cantidadPersonas, comentarios } = body;
-    const fechasBloqueadasManuales = obtenerFechasBloqueadasManuales();
+    const body = await request.json().catch(() => null);
 
-    if (!nombreCompleto || !email || !telefono || !fecha || !cantidadPersonas) {
-      return NextResponse.json({ error: 'Faltan datos requeridos' }, { status: 400 });
+    // Validación de la fuente de verdad: nunca confiamos en lo que manda el cliente.
+    const parsed = reservaInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' },
+        { status: 400 }
+      );
     }
+
+    const { nombreCompleto, email, telefono, fecha, cantidadPersonas, comentarios } = parsed.data;
+    const fechasBloqueadasManuales = obtenerFechasBloqueadasManuales();
 
     if (fechasBloqueadasManuales.includes(fecha)) {
       return NextResponse.json(
@@ -134,6 +141,16 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (errorReserva) {
+      // 23505 = unique_violation. El índice único parcial sobre `fecha` (estados
+      // activos) es la última línea de defensa contra dobles reservas en una
+      // carrera: si dos pedidos pasan el chequeo de disponibilidad a la vez, la
+      // base rechaza el segundo insert acá.
+      if ((errorReserva as { code?: string }).code === '23505') {
+        return NextResponse.json(
+          { error: 'La fecha seleccionada ya no está disponible' },
+          { status: 409 }
+        );
+      }
       return NextResponse.json({ error: 'Error al crear la reserva' }, { status: 500 });
     }
 
