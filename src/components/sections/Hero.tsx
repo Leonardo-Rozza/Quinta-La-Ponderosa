@@ -16,8 +16,10 @@ export function Hero() {
         sizes="100vw"
       />
 
-      {/* Overlay oscuro con gradiente */}
-      <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-black/30" />
+      {/* Overlay cálido con gradiente (tinte sepia en vez de negro puro) */}
+      <div className="absolute inset-0 bg-linear-to-r from-[#241a10]/75 via-[#241a10]/50 to-[#241a10]/25" />
+      {/* Fundido inferior hacia el color de fondo para una transición suave */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-crema to-transparent" />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
