@@ -1,4 +1,4 @@
-import { CONFIG } from '@/lib/constants';
+import { generarLinkWhatsApp } from '@/lib/utils';
 import { ArrowLeft, Clock, Phone } from 'lucide-react';
 import Link from 'next/link';
 
@@ -34,7 +34,7 @@ export default function ReservaPendiente() {
             Volver al inicio
           </Link>
           <a
-            href={`https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent('Hola! Tengo un pago pendiente para mi reserva en La Ponderosa')}`}
+            href={generarLinkWhatsApp('Hola! Tengo un pago pendiente para mi reserva en La Ponderosa')}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-oliva flex-1 justify-center"

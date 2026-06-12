@@ -70,7 +70,6 @@ export interface Database {
   };
 }
 
-let supabaseClient: SupabaseClient<Database> | null = null;
 let supabaseAdminClient: SupabaseClient<Database> | null = null;
 
 function getRequiredEnv(name: string) {
@@ -83,30 +82,10 @@ function getRequiredEnv(name: string) {
   return value;
 }
 
-export function hasSupabasePublicConfig() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
-  );
-}
-
 export function hasSupabaseAdminConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
   );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CLIENTE PÚBLICO (para el frontend)
-// ─────────────────────────────────────────────────────────────────────────────
-export function getSupabase() {
-  if (!supabaseClient) {
-    supabaseClient = createClient(
-      getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
-      getRequiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
-    );
-  }
-
-  return supabaseClient;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,22 +100,4 @@ export function getSupabaseAdmin() {
   }
 
   return supabaseAdminClient;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FUNCIONES HELPER
-// ─────────────────────────────────────────────────────────────────────────────
-export async function obtenerFechasOcupadas(): Promise<string[]> {
-  const { data, error } = await getSupabase()
-    .from('reservas')
-    .select('fecha')
-    .eq('estado', 'confirmada');
-
-  if (error) {
-    console.error('Error obteniendo fechas ocupadas:', error);
-    return [];
-  }
-
-  const reservas = (data ?? []) as Array<Pick<Reserva, 'fecha'>>;
-  return reservas.map((reserva) => reserva.fecha);
 }

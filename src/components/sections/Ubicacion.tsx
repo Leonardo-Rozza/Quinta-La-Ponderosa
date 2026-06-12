@@ -1,4 +1,5 @@
 import { CONFIG, PRECIOS } from '@/lib/constants';
+import { generarLinkWhatsApp } from '@/lib/utils';
 import { Car, Clock, MapPin, Phone } from 'lucide-react';
 
 export function Ubicacion() {
@@ -74,7 +75,7 @@ export function Ubicacion() {
 
             {/* Botón de contacto */}
             <a
-              href={`https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent('Hola! Necesito indicaciones para llegar a La Ponderosa')}`}
+              href={generarLinkWhatsApp('Hola! Necesito indicaciones para llegar a La Ponderosa')}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-oliva w-full justify-center"

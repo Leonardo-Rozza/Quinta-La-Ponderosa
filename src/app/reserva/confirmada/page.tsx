@@ -1,4 +1,4 @@
-import { CONFIG } from '@/lib/constants';
+import { generarLinkWhatsApp } from '@/lib/utils';
 import { ArrowLeft, CheckCircle, Phone } from 'lucide-react';
 import Link from 'next/link';
 
@@ -46,7 +46,7 @@ export default function ReservaConfirmada() {
             Volver al inicio
           </Link>
           <a
-            href={`https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent('Hola! Acabo de confirmar mi reserva en La Ponderosa 🎉')}`}
+            href={generarLinkWhatsApp('Hola! Acabo de confirmar mi reserva en La Ponderosa 🎉')}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-oliva flex-1 justify-center"

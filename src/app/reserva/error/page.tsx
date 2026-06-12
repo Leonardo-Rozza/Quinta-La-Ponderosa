@@ -1,4 +1,4 @@
-import { CONFIG } from '@/lib/constants';
+import { generarLinkWhatsApp } from '@/lib/utils';
 import { Phone, RefreshCw, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,7 +33,7 @@ export default function ReservaError() {
             Intentar de nuevo
           </Link>
           <a
-            href={`https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent('Hola! Tuve un problema con el pago de mi reserva en La Ponderosa')}`}
+            href={generarLinkWhatsApp('Hola! Tuve un problema con el pago de mi reserva en La Ponderosa')}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary flex-1 justify-center"

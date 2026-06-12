@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { CONFIG } from "@/lib/constants";
+import { generarLinkWhatsApp } from "@/lib/utils";
 
 export function WhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,9 +30,7 @@ export function WhatsAppButton() {
   }, [isVisible]);
 
   // Generar link de WhatsApp
-  const whatsappLink = `https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent(
-    CONFIG.whatsappMessage
-  )}`;
+  const whatsappLink = generarLinkWhatsApp();
 
   return (
     <>
