@@ -13,6 +13,10 @@ export const CONFIG = {
   whatsappMessage: 'Hola! Me interesa hacer una reserva en La Ponderosa!',
 } as const;
 
+// Minutos que una reserva "pendiente" (sin pago acreditado) mantiene bloqueada
+// la fecha antes de considerarse vencida y liberarse.
+export const RESERVA_HOLD_MINUTES = 30;
+
 export const PRECIOS = {
   porDia: 300_000,
   porcentajeSena: 0.5, // 50%

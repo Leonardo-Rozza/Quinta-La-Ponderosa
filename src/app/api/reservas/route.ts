@@ -1,11 +1,10 @@
-import { PRECIOS, obtenerFechasBloqueadasManuales } from '@/lib/constants';
+import { PRECIOS, RESERVA_HOLD_MINUTES, obtenerFechasBloqueadasManuales } from '@/lib/constants';
 import { getSupabaseAdmin, hasSupabaseAdminConfig, type Reserva } from '@/lib/supabase';
 import { reservaInputSchema } from '@/lib/validations';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextRequest, NextResponse } from 'next/server';
 
 const ESTADOS_BLOQUEANTES = ['confirmada', 'pendiente'] as const;
-const RESERVA_HOLD_MINUTES = 30;
 type ReservaBloqueante = Pick<Reserva, 'id' | 'estado' | 'creado_en'>;
 type ReservaBloqueanteConFecha = Pick<Reserva, 'fecha' | 'estado' | 'creado_en'>;
 

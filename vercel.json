@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/limpiar-pendientes",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
