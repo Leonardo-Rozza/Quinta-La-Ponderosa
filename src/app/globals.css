@@ -24,6 +24,10 @@
   --color-disponible: #6b9b5e;
   --color-ocupado: #d4534b;
 
+  /* Acentos cálidos para reforzar la identidad de quinta/campo */
+  --color-arena: #e8dcc8;
+  --color-dorado: #c69749;
+
   /* ═══════════════════════════════════════════════════════════════════════════
      FUENTES
      ═══════════════════════════════════════════════════════════════════════════ */
@@ -140,6 +144,13 @@ img {
   -webkit-user-drag: none;
 }
 
+/* Textura de grano sutil tipo papel/lino para dar calidez "artesanal" */
+body {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    COMPONENTES REUTILIZABLES
    ───────────────────────────────────────────────────────────────────────────── */
@@ -190,15 +201,29 @@ img {
   }
 }
 
-/* Etiqueta encima del título */
+/* Etiqueta encima del título, con guion decorativo a cada lado */
 .section-label {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
   color: #c17f59;
   font-weight: 600;
   font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
+}
+
+.section-label::before,
+.section-label::after {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #c69749);
+}
+
+.section-label::after {
+  background: linear-gradient(to left, transparent, #c69749);
 }
 
 @media (min-width: 640px) {
@@ -235,7 +260,7 @@ img {
 
 .btn-primary:hover {
   background-color: #a66b48;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(74, 52, 36, 0.12);
   transform: translateY(-2px);
 }
 
@@ -300,7 +325,7 @@ img {
 
 .btn-oliva:hover {
   background-color: #7a8b66;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(74, 52, 36, 0.12);
   transform: translateY(-2px);
 }
 
@@ -309,7 +334,8 @@ img {
   background-color: #fffef9;
   border-radius: 1rem;
   padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(193, 127, 89, 0.12);
+  box-shadow: 0 1px 3px rgba(74, 52, 36, 0.12);
   transition: box-shadow 0.3s ease;
 }
 
@@ -321,7 +347,7 @@ img {
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(74, 52, 36, 0.12);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -366,12 +392,13 @@ img {
   background-color: #ebe4d8;
   border-radius: 1rem;
   overflow: hidden;
+  border: 1px solid rgba(193, 127, 89, 0.14);
   transition: all 0.3s ease;
 }
 
 .servicio-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(74, 52, 36, 0.12);
 }
 
 /* Línea decorativa superior */
@@ -419,7 +446,7 @@ img {
   background-color: #fffef9;
   border-radius: 1rem;
   padding: 1.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(74, 52, 36, 0.07);
   transition: all 0.3s ease;
 }
 
@@ -430,7 +457,7 @@ img {
 }
 
 .testimonio-card:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(74, 52, 36, 0.1);
   transform: translateY(-2px);
 }
 
@@ -532,6 +559,7 @@ img {
   background-color: #ebe4d8;
   border-radius: 1.5rem;
   padding: 1.5rem;
+  border: 1px solid rgba(193, 127, 89, 0.14);
 }
 
 @media (min-width: 640px) {
@@ -600,7 +628,7 @@ img {
 
 .calendario-dia-disponible:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(74, 52, 36, 0.12);
 }
 
 /* Día ocupado */
@@ -668,6 +696,7 @@ img {
   background-color: #f5f0e8;
   border-radius: 1.5rem;
   padding: 1.5rem;
+  border: 1px solid rgba(193, 127, 89, 0.14);
 }
 
 @media (min-width: 640px) {
@@ -872,7 +901,7 @@ img {
   background-color: white;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(74, 52, 36, 0.18);
   animation: tooltip-appear 0.3s ease;
 }
 
@@ -904,5 +933,5 @@ img {
   height: 12px;
   background-color: white;
   transform: rotate(45deg);
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 2px 4px rgba(74, 52, 36, 0.07);
 }
