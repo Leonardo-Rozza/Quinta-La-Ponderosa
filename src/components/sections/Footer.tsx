@@ -9,7 +9,7 @@ export function Footer() {
     <footer id="contacto" className="bg-negro text-white">
       {/* Contenido principal */}
       <div className="section-container py-12 sm:py-16">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:gap-12">
           {/* Columna 1: Logo y descripción */}
           <div className="sm:col-span-2 lg:col-span-1 lg:max-w-sm">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
@@ -97,7 +97,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="sm:max-w-xs lg:justify-self-end">
+          <div className="sm:max-w-xs">
             <h4 className="font-semibold text-white mb-4">Horarios</h4>
             <div className="space-y-3 text-sm">
               <div>
