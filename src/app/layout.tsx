@@ -16,7 +16,13 @@ const sourceSans = Source_Sans_3({
   display: 'swap',
 });
 
+const siteUrl =
+  process.env.SITE_URL?.trim() ||
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  'http://localhost:3000';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: 'La Ponderosa | Quinta en Alquiler - José C. Paz, Buenos Aires',
   description:
     'Alquilá La Ponderosa por día, pileta, quincho equipado. Hasta 30 personas. Ideal para eventos, cumpleaños y reuniones familiares.',
