@@ -27,9 +27,9 @@ export function Ubicacion() {
                 <div>
                   <h3 className="font-serif text-lg text-negro mb-1">Dirección</h3>
                   <p className="text-negro/70">
-                    Eduardo Wilde 2055
+                    {CONFIG.direccionCalle}
                     <br />
-                    José C. Paz, Buenos Aires
+                    {CONFIG.direccionLocalidad}
                   </p>
                 </div>
               </div>

@@ -5,7 +5,11 @@ export const CONFIG = {
   email: 'leonardorozza.dev@gmail.com',
   instagram: '@laponderosa',
   instagramUrl: 'https://www.instagram.com/quintalaponderosa.jcp/',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=61553456481253',
   direccion: 'José C. Paz · Buenos Aires',
+  direccionCalle: 'Eduardo Wilde 2055',
+  direccionLocalidad: 'José C. Paz, Buenos Aires',
+  horarioAtencion: 'Lun a Sáb, 9:00 a 21:00 hs',
   whatsappMessage: 'Hola! Me interesa hacer una reserva en La Ponderosa!',
 } as const;
 

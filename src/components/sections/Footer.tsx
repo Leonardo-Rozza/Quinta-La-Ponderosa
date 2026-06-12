@@ -1,4 +1,4 @@
-import { CONFIG } from '@/lib/constants';
+import { CONFIG, PRECIOS } from '@/lib/constants';
 import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
 import Link from 'next/link';
 
@@ -44,7 +44,7 @@ export function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://www.facebook.com/profile.php?id=61553456481253"
+                href={CONFIG.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer-social-btn"
@@ -102,11 +102,13 @@ export function Footer() {
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-white/60">Horario de uso</p>
-                <p className="text-white">10:00 a 20:00 hs</p>
+                <p className="text-white">
+                  {PRECIOS.horarioInicio} a {PRECIOS.horarioFin} hs
+                </p>
               </div>
               <div>
                 <p className="text-white/60">Atención consultas</p>
-                <p className="text-white">Lun a Sáb, 9:00 a 21:00 hs</p>
+                <p className="text-white">{CONFIG.horarioAtencion}</p>
               </div>
             </div>
           </div>
