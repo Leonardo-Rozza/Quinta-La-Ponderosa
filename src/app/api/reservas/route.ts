@@ -162,6 +162,11 @@ export async function POST(request: NextRequest) {
     const siteUrl = getSiteUrl();
     const preference = new Preference(getMercadoPagoClient());
 
+    // Mercado Pago rechaza `auto_return` si las back_urls no son públicas
+    // (p. ej. localhost en desarrollo). Solo lo activamos cuando el sitio
+    // corre sobre HTTPS, que es el caso en producción.
+    const sitioEsPublico = siteUrl.startsWith('https://');
+
     let mpPreference;
 
     try {
@@ -187,7 +192,7 @@ export async function POST(request: NextRequest) {
             failure: siteUrl + '/reserva/error',
             pending: siteUrl + '/reserva/pendiente',
           },
-          auto_return: 'approved',
+          ...(sitioEsPublico ? { auto_return: 'approved' as const } : {}),
           external_reference: reserva.id,
           metadata: {
             reserva_id: reserva.id,
