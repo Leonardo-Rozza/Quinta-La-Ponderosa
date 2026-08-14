@@ -1,95 +1,72 @@
-import { CONFIG } from '@/lib/constants';
-import { MapPin } from 'lucide-react';
+import { CONFIG, PRECIOS } from '@/lib/constants';
+import { ArrowDown, CalendarDays, MapPin, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Dayline } from './shared/Dayline';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen w-full overflow-hidden">
+    <section id="inicio" className="hero" aria-labelledby="hero-title">
       <Image
         src="/images/hero.jpeg"
-        alt="Vista del parque de La Ponderosa"
+        alt="Pileta, parque y gazebo de La Ponderosa"
         fill
         priority
-        quality={85}
-        className="object-cover object-center"
+        quality={75}
+        className="hero__image"
         sizes="100vw"
       />
+      <div className="hero__wash" aria-hidden="true" />
 
-      {/* Overlay cálido con gradiente (tinte sepia en vez de negro puro) */}
-      <div className="absolute inset-0 bg-linear-to-r from-[#241a10]/75 via-[#241a10]/50 to-[#241a10]/25" />
-      {/* Fundido inferior hacia el color de fondo para una transición suave */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-crema to-transparent" />
+      <div className="section-container hero__content">
+        <div className="hero__location">
+          <MapPin aria-hidden="true" />
+          <span>{CONFIG.direccion}</span>
+        </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col justify-center px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl">
-          <div
-            className="
-              mb-4 sm:mb-6
-              inline-flex items-center gap-2
-              rounded-full
-              bg-white/10 backdrop-blur-sm
-              px-4 py-2
-              text-white/90 text-sm
-              animate-fade-in-down
-            "
-          >
-            <MapPin className="h-4 w-4" />
-            <span>{CONFIG.direccion}</span>
+        <p className="hero__kicker">La jornada Ponderosa</p>
+        <h1 id="hero-title">
+          Un día entero
+          <span> para volver a encontrarse.</span>
+        </h1>
+        <p className="hero__lede">
+          Quinta de uso exclusivo con pileta, parque y quincho equipado. Un plan simple de organizar
+          para reuniones de hasta {PRECIOS.maximoPersonas} personas.
+        </p>
+
+        <div className="hero__actions">
+          <Link href="#reservas" className="button button--primary button--large">
+            <CalendarDays aria-hidden="true" />
+            Ver fechas disponibles
+          </Link>
+          <Link href="#galeria" className="button button--ghost button--large">
+            Conocer el lugar
+            <ArrowDown aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="hero__facts" aria-label="Datos principales de la quinta">
+          <div>
+            <span className="hero__fact-icon" aria-hidden="true">
+              <Users />
+            </span>
+            <p>
+              <strong>Hasta {PRECIOS.maximoPersonas}</strong>
+              <span>personas</span>
+            </p>
           </div>
-
-          <h1
-            className="
-              font-serif text-white
-              text-4xl sm:text-5xl md:text-6xl lg:text-7xl
-              leading-tight
-              max-w-xl lg:max-w-2xl
-              mb-4 sm:mb-6
-              animate-fade-in-up
-            "
-            style={{ animationDelay: '0.1s', animationFillMode: 'backwards' }}
-          >
-            Tu refugio en la <span className="text-terracota italic">naturaleza</span>
-          </h1>
-
-          <p
-            className="
-              text-white/80
-              text-base sm:text-lg lg:text-xl
-              leading-relaxed
-              max-w-md lg:max-w-lg
-              mb-6 sm:mb-8
-              animate-fade-in-up
-            "
-            style={{ animationDelay: '0.2s', animationFillMode: 'backwards' }}
-          >
-            Desconectate de la ciudad en nuestra quinta. Perfecta para familias y grupos de amigos
-            que buscan tranquilidad, naturaleza y momentos inolvidables.
-          </p>
-
-          <div
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up"
-            style={{ animationDelay: '0.3s', animationFillMode: 'backwards' }}
-          >
-            <Link href="#reservas" className="btn-primary">
-              Ver Disponibilidad
-            </Link>
-            <Link
-              href="#galeria"
-              className="btn-secondary border-white text-white hover:bg-white hover:text-negro"
-            >
-              Ver Galería
-            </Link>
+          <div>
+            <span className="hero__fact-mark" aria-hidden="true" />
+            <p>
+              <strong>Uso exclusivo</strong>
+              <span>sin compartir espacios</span>
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Indicador de scroll (solo desktop) */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-white/60">
-        <span className="text-xs uppercase tracking-widest">Scroll</span>
-        <div className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2">
-          <div className="w-1 h-2 bg-white/60 rounded-full animate-bounce" />
-        </div>
+      <div className="hero__dayline">
+        <Dayline compact inverse />
       </div>
     </section>
   );

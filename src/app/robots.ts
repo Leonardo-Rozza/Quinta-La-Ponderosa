@@ -5,6 +5,8 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
   'http://localhost:3000';
 
+const baseUrl = siteUrl.replace(/\/$/, '');
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
@@ -12,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/reserva/'],
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }

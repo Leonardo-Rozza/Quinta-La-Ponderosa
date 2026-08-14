@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// Reservas/index.tsx - Sección completa de reservas
-// ═══════════════════════════════════════════════════════════════════════════════
 'use client';
 
 import { useCalendario } from '@/hooks/useCalendario';
@@ -8,215 +5,313 @@ import { PRECIOS } from '@/lib/constants';
 import { formatearPrecio } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, Clock, CreditCard, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { AlertTriangle, ArrowRight, CalendarDays, Check, Clock3, Loader2, RefreshCw, ShieldCheck, Users } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { SectionIntro } from '../shared/SectionIntro';
 import { Calendario } from './Calendario';
 import { DatosReserva, FormReserva } from './FormReserva';
 
+type Paso = 1 | 2 | 3;
+type EstadoDisponibilidad = 'loading' | 'ready' | 'error';
+
+const PASOS = [
+  { numero: 1, titulo: 'Elegí el día', detalle: 'Disponibilidad real' },
+  { numero: 2, titulo: 'Tus datos', detalle: 'Para coordinar' },
+  { numero: 3, titulo: 'Seña segura', detalle: 'Con Mercado Pago' },
+] as const;
+
+function crearBookingRequestId() {
+  const webCrypto = globalThis.crypto;
+  if (typeof webCrypto?.randomUUID === 'function') return webCrypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  if (typeof webCrypto?.getRandomValues === 'function') {
+    webCrypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) bytes[index] = Math.floor(Math.random() * 256);
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const value = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return `${value.slice(0, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}-${value.slice(16, 20)}-${value.slice(20)}`;
+}
+
+function esCheckoutMercadoPago(urlValue: string) {
+  try {
+    const url = new URL(urlValue);
+    const host = url.hostname.toLowerCase();
+    const dominioValido =
+      host === 'mercadopago.com' ||
+      host.endsWith('.mercadopago.com') ||
+      host === 'mercadopago.com.ar' ||
+      host.endsWith('.mercadopago.com.ar');
+    return url.protocol === 'https:' && dominioValido;
+  } catch {
+    return false;
+  }
+}
+
 export function Reservas() {
+  const [pasoActivo, setPasoActivo] = useState<Paso>(1);
   const [fechasOcupadas, setFechasOcupadas] = useState<Date[]>([]);
-  const [cargandoFechas, setCargandoFechas] = useState(true);
-
-  const calendario = useCalendario({
-    fechasOcupadas,
-  });
-
+  const [maxAdvanceDays, setMaxAdvanceDays] = useState(0);
+  const [estadoDisponibilidad, setEstadoDisponibilidad] = useState<EstadoDisponibilidad>('loading');
+  const [errorDisponibilidad, setErrorDisponibilidad] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const bookingRequest = useRef<{ id: string; fingerprint: string } | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+  const pasoAnterior = useRef<Paso>(1);
 
-  useEffect(() => {
-    async function cargarFechasOcupadas() {
-      try {
-        const response = await fetch('/api/reservas');
-        const data = await response.json();
+  const calendario = useCalendario({ fechasOcupadas, maxAdvanceDays });
 
-        if (data.fechasOcupadas) {
-          const fechas = data.fechasOcupadas.map((f: string) => new Date(f + 'T12:00:00'));
-          setFechasOcupadas(fechas);
-        }
-      } catch (err) {
-        console.error('Error cargando fechas:', err);
-      } finally {
-        setCargandoFechas(false);
+  const cargarFechasOcupadas = useCallback(async (signal?: AbortSignal) => {
+    await Promise.resolve();
+    if (signal?.aborted) return;
+    setEstadoDisponibilidad('loading');
+    setErrorDisponibilidad('');
+
+    try {
+      const response = await fetch('/api/reservas', { cache: 'no-store', signal });
+      const data = (await response.json().catch(() => null)) as
+        | { fechasOcupadas?: string[]; maxAdvanceDays?: number; warning?: string; error?: { code?: string; message?: string; retryable?: boolean } }
+        | null;
+
+      if (!response.ok || !data) {
+        throw new Error(data?.error?.message || 'No pudimos consultar las fechas.');
       }
-    }
 
-    cargarFechasOcupadas();
+      if (data.warning) {
+        throw new Error('La disponibilidad online está temporalmente incompleta.');
+      }
+
+      if (!Array.isArray(data.fechasOcupadas) || !Number.isInteger(data.maxAdvanceDays) || (data.maxAdvanceDays ?? 0) < 1) {
+        throw new Error('La respuesta de disponibilidad no es válida.');
+      }
+
+      setFechasOcupadas(data.fechasOcupadas.map((fecha) => new Date(`${fecha}T12:00:00`)));
+      setMaxAdvanceDays(data.maxAdvanceDays as number);
+      setEstadoDisponibilidad('ready');
+    } catch (fetchError) {
+      if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return;
+      console.error('Error cargando disponibilidad:', fetchError);
+      setEstadoDisponibilidad('error');
+      setErrorDisponibilidad(
+        fetchError instanceof Error ? fetchError.message : 'No pudimos consultar las fechas.'
+      );
+    }
   }, []);
 
-  const handleSubmit = async (datos: DatosReserva) => {
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => void cargarFechasOcupadas(controller.signal), 0);
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [cargarFechasOcupadas]);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  useEffect(() => {
+    if (pasoAnterior.current === pasoActivo) return;
+    pasoAnterior.current = pasoActivo;
+    const targetId = pasoActivo === 1 ? 'booking-date-title' : pasoActivo === 2 ? 'booking-contact-title' : 'booking-review-title';
+    const frame = window.requestAnimationFrame(() => document.getElementById(targetId)?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [pasoActivo]);
+
+  const fechaLabel = calendario.fechaSeleccionada
+    ? format(calendario.fechaSeleccionada, "EEEE d 'de' MMMM 'de' yyyy", { locale: es })
+    : '';
+
+  const avanzarADatos = () => {
     if (!calendario.fechaSeleccionada) {
-      setError('Por favor seleccioná una fecha');
+      setError('Elegí una fecha disponible para continuar.');
       return;
     }
+    setError(null);
+    setPasoActivo(2);
+  };
+
+  const handleSubmit = async (datos: DatosReserva) => {
+    if (!calendario.fechaSeleccionada || isLoading) return;
 
     setIsLoading(true);
     setError(null);
 
-    try {
-      const fechaFormateada = format(calendario.fechaSeleccionada, 'yyyy-MM-dd');
+    const requestPayload = {
+      nombreCompleto: datos.nombreCompleto.trim(),
+      email: datos.email.trim(),
+      telefono: datos.telefono.trim(),
+      cantidadPersonas: datos.cantidadPersonas,
+      comentarios: datos.comentarios?.trim() || '',
+      fecha: format(calendario.fechaSeleccionada, 'yyyy-MM-dd'),
+      honeypot: datos.honeypot || '',
+      aceptarTerminos: datos.aceptarTerminos,
+    };
+    const fingerprint = JSON.stringify(requestPayload);
+    if (!bookingRequest.current || bookingRequest.current.fingerprint !== fingerprint) {
+      bookingRequest.current = { id: crearBookingRequestId(), fingerprint };
+    }
 
+    try {
       const response = await fetch('/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...datos,
-          fecha: fechaFormateada,
+          ...requestPayload,
+          bookingRequestId: bookingRequest.current.id,
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json().catch(() => null)) as
+        | { checkoutUrl?: string; sandboxUrl?: string; error?: { code?: string; message?: string; retryable?: boolean; field?: string } }
+        | null;
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al crear la reserva');
+        if (response.status === 409) {
+          calendario.resetearSeleccion();
+          setPasoActivo(1);
+          bookingRequest.current = null;
+          void cargarFechasOcupadas();
+          throw new Error('Esa fecha acaba de ocuparse. Actualizamos el calendario para que elijas otra.');
+        }
+        throw new Error(data?.error?.message || 'No pudimos preparar el pago. Intentá nuevamente.');
       }
 
-      const checkoutUrl = data.checkoutUrl || data.sandboxUrl;
-
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error('No se recibió URL de pago');
+      const checkoutUrl = data?.checkoutUrl || data?.sandboxUrl;
+      if (!checkoutUrl || !esCheckoutMercadoPago(checkoutUrl)) {
+        throw new Error('No pudimos validar el enlace de pago. Escribinos o intentá nuevamente.');
       }
-    } catch (err) {
-      console.error('Error:', err);
-      setError(err instanceof Error ? err.message : 'Error al procesar la reserva');
+
+      window.location.assign(checkoutUrl);
+    } catch (submitError) {
+      console.error('Error iniciando reserva:', submitError);
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'No pudimos iniciar el pago. Intentá nuevamente.'
+      );
       setIsLoading(false);
     }
   };
 
   return (
-    <section id="reservas" className="py-16 sm:py-20 lg:py-24 bg-blanco">
-      <div className="section-container">
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="section-label">Reservas</span>
-          <h2 className="section-title mb-4">Reservá tu día</h2>
-          <p className="text-negro/70 text-base sm:text-lg max-w-2xl mx-auto">
-            Seleccioná la fecha, completá tus datos y pagá la seña online
-          </p>
-        </div>
+    <section id="reservas" className="booking section-shell" aria-labelledby="booking-title">
+      <div className="section-container booking__container">
+        <SectionIntro
+          eyebrow="04 · Reservar la jornada"
+          title={<span id="booking-title">Tres pasos. Una fecha para encontrarse.</span>}
+          description="Consultá disponibilidad en tiempo real, dejá tus datos y pagá sólo la seña desde el entorno seguro de Mercado Pago."
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          <div className="space-y-6">
-            <div className="precio-card">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-white/80 text-sm">Precio por día</span>
-                  <p className="font-serif text-3xl sm:text-4xl text-white mt-1">
-                    {formatearPrecio(PRECIOS.porDia)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-white/80 text-sm">Seña (50%)</span>
-                  <p className="font-semibold text-xl text-white mt-1">
-                    {formatearPrecio(PRECIOS.porDia * PRECIOS.porcentajeSena)}
-                  </p>
-                </div>
+        <ol className="booking-steps" aria-label="Pasos de la reserva">
+          {PASOS.map((paso) => {
+            const completo = paso.numero < pasoActivo;
+            const habilitado = paso.numero <= pasoActivo && (paso.numero === 1 || calendario.fechaSeleccionada);
+            return (
+              <li className={paso.numero === pasoActivo ? 'booking-step--active' : completo ? 'booking-step--complete' : ''} key={paso.numero}>
+                <button
+                  type="button"
+                  onClick={() => habilitado && setPasoActivo(paso.numero as Paso)}
+                  disabled={!habilitado}
+                  aria-current={paso.numero === pasoActivo ? 'step' : undefined}
+                >
+                  <span className="booking-step__number" aria-hidden="true">{completo ? <Check /> : paso.numero}</span>
+                  <span><strong>{paso.titulo}</strong><small>{paso.detalle}</small></span>
+                </button>
+                {paso.numero < 3 ? <i aria-hidden="true" /> : null}
+              </li>
+            );
+          })}
+        </ol>
+
+        {error ? (
+          <div className="booking-alert booking-alert--error" role="alert" tabIndex={-1} ref={errorRef}>
+            <AlertTriangle aria-hidden="true" />
+            <div><strong>No pudimos continuar</strong><p>{error}</p></div>
+            <button type="button" onClick={() => setError(null)} aria-label="Cerrar mensaje">×</button>
+          </div>
+        ) : null}
+
+        <div className="booking-stage" hidden={pasoActivo !== 1}>
+          <h3 className="sr-only" id="booking-date-title" tabIndex={-1}>Elegí una fecha disponible</h3>
+          <div className="booking-stage__calendar">
+            {estadoDisponibilidad === 'loading' ? (
+              <div className="availability-state" role="status">
+                <Loader2 className="spin" aria-hidden="true" />
+                <h3>Consultando fechas</h3>
+                <p>Un momento, estamos verificando la disponibilidad real.</p>
               </div>
-
-              <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2 text-white/80 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {PRECIOS.horarioInicio} a {PRECIOS.horarioFin} hs
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-white/80 text-sm">
-                  <Calendar className="w-4 h-4" />
-                  <span>Hasta {PRECIOS.maximoPersonas} personas</span>
-                </div>
-              </div>
-            </div>
-
-            {cargandoFechas ? (
-              <div className="calendario-container flex items-center justify-center min-h-75">
-                <div className="text-center">
-                  <Loader2 className="w-8 h-8 text-terracota animate-spin mx-auto mb-2" />
-                  <p className="text-negro/60 text-sm">Cargando disponibilidad...</p>
-                </div>
+            ) : estadoDisponibilidad === 'error' ? (
+              <div className="availability-state availability-state--error" role="alert">
+                <AlertTriangle aria-hidden="true" />
+                <h3>No podemos confirmar fechas ahora</h3>
+                <p>{errorDisponibilidad} Para evitar superposiciones, pausamos la selección.</p>
+                <button type="button" className="button button--secondary" onClick={() => void cargarFechasOcupadas()}>
+                  <RefreshCw aria-hidden="true" />
+                  Volver a intentar
+                </button>
               </div>
             ) : (
               <Calendario
                 nombreMes={calendario.nombreMes}
                 diasDelMes={calendario.diasDelMes}
                 getDiaInfo={calendario.getDiaInfo}
-                onSeleccionarDia={calendario.seleccionarDia}
+                onSeleccionarDia={(fecha) => {
+                  calendario.seleccionarDia(fecha);
+                  setError(null);
+                }}
                 onMesAnterior={calendario.irMesAnterior}
                 onMesSiguiente={calendario.irMesSiguiente}
                 puedeIrAtras={calendario.puedeIrAtras}
+                puedeIrAdelante={calendario.puedeIrAdelante}
               />
             )}
           </div>
 
-          <div>
-            {calendario.fechaSeleccionada ? (
-              <div className="fecha-seleccionada-card mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-terracota/10 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-terracota" />
-                  </div>
-                  <div>
-                    <span className="text-negro/60 text-sm">Fecha seleccionada</span>
-                    <p className="font-serif text-lg text-negro capitalize">
-                      {format(calendario.fechaSeleccionada, "EEEE d 'de' MMMM", {
-                        locale: es,
-                      })}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="fecha-seleccionada-card mb-6 border-dashed">
-                <div className="flex items-center gap-3 text-negro/50">
-                  <div className="w-12 h-12 rounded-full bg-negro/5 flex items-center justify-center">
-                    <Calendar className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Seleccioná una fecha</p>
-                    <p className="text-sm">Hacé click en un día disponible</p>
-                  </div>
-                </div>
-              </div>
-            )}
+          <aside className="booking-stage__summary" aria-label="Resumen de la jornada">
+            <p className="booking-stage__eyebrow">La jornada completa</p>
+            <p className="booking-stage__price">{formatearPrecio(PRECIOS.porDia)}</p>
+            <ul>
+              <li><Clock3 aria-hidden="true" /><span><strong>{PRECIOS.horarioInicio} a {PRECIOS.horarioFin} hs</strong>Uso exclusivo durante el día</span></li>
+              <li><Users aria-hidden="true" /><span><strong>Hasta {PRECIOS.maximoPersonas} personas</strong>Una tarifa clara para todo el grupo</span></li>
+              <li><ShieldCheck aria-hidden="true" /><span><strong>Seña del {PRECIOS.porcentajeSena * 100}%</strong>{formatearPrecio(PRECIOS.sena)} mediante Mercado Pago</span></li>
+            </ul>
 
-            {error && (
-              <div className="bg-ocupado/10 border border-ocupado/20 rounded-xl p-4 mb-6">
-                <p className="text-ocupado text-sm">{error}</p>
+            <div className={`selected-date${calendario.fechaSeleccionada ? ' selected-date--ready' : ''}`} aria-live="polite">
+              <CalendarDays aria-hidden="true" />
+              <div>
+                <span>{calendario.fechaSeleccionada ? 'Fecha elegida' : 'Primero elegí el día'}</span>
+                <strong className={calendario.fechaSeleccionada ? 'capitalize' : undefined}>
+                  {fechaLabel || 'El calendario está a la izquierda'}
+                </strong>
               </div>
-            )}
-
-            <div className="form-container">
-              <h3 className="font-serif text-xl text-negro mb-6">Datos de contacto</h3>
-              <FormReserva onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
 
-            {calendario.fechaSeleccionada && (
-              <div className="resumen-pago mt-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <CreditCard className="w-5 h-5 text-negro/70" />
-                  <h4 className="font-semibold text-negro">Resumen</h4>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-negro/70">Alquiler por día</span>
-                    <span className="text-negro">{formatearPrecio(PRECIOS.porDia)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-negro/70">Seña a pagar (50%)</span>
-                    <span className="text-negro font-medium">
-                      {formatearPrecio(PRECIOS.porDia * PRECIOS.porcentajeSena)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm pt-2 border-t border-negro/10">
-                    <span className="text-negro/70">Resto a pagar en el lugar</span>
-                    <span className="text-negro">
-                      {formatearPrecio(PRECIOS.porDia * (1 - PRECIOS.porcentajeSena))}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+            <button
+              type="button"
+              className="button button--primary button--large booking-stage__continue"
+              onClick={avanzarADatos}
+              disabled={!calendario.fechaSeleccionada || estadoDisponibilidad !== 'ready'}
+            >
+              Continuar con esta fecha
+              <ArrowRight aria-hidden="true" />
+            </button>
+          </aside>
+        </div>
+
+        <div hidden={pasoActivo === 1}>
+          <FormReserva
+            activeStep={pasoActivo === 3 ? 3 : 2}
+            fechaLabel={fechaLabel}
+            isLoading={isLoading}
+            onBack={() => setPasoActivo(pasoActivo === 3 ? 2 : 1)}
+            onReview={() => setPasoActivo(3)}
+            onSubmit={handleSubmit}
+          />
         </div>
       </div>
     </section>

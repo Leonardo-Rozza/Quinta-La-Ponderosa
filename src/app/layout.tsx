@@ -10,7 +10,7 @@ const dmSerifDisplay = DM_Serif_Display({
 });
 
 const sourceSans = Source_Sans_3({
-  weight: ['300', '400', '500', '600'],
+  weight: 'variable',
   subsets: ['latin'],
   variable: '--font-source-sans',
   display: 'swap',
@@ -60,6 +60,12 @@ export const metadata: Metadata = {
     locale: 'es_AR',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'La Ponderosa | Quinta en alquiler',
+    description: 'Una jornada al aire libre, con pileta y quincho equipado en José C. Paz.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function RootLayout({
@@ -70,6 +76,9 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${dmSerifDisplay.variable} ${sourceSans.variable}`}>
       <body className="font-sans bg-crema text-negro antialiased overflow-x-hidden">
+        <a className="skip-link" href="#contenido">
+          Saltar al contenido
+        </a>
         {children}
       </body>
     </html>

@@ -1,93 +1,79 @@
-import { Car, Flame, Microwave, Users, Waves, Wifi } from 'lucide-react';
+import { Car, Flame, Microwave, Refrigerator, Users, Waves, Wifi } from 'lucide-react';
+import { SectionIntro } from './shared/SectionIntro';
 
 const SERVICIOS = [
   {
     icono: Waves,
-    titulo: 'Pileta',
-    descripcion: 'Pileta espaciada, ideal para toda la familia',
-  },
-  {
-    icono: Microwave,
-    titulo: 'Horno de Barro',
-    descripcion: 'Contamos con un horno de barro para pizzas y guisos',
+    titulo: 'Pileta y solárium',
+    descripcion: 'El centro del verano, con reposeras y sombra cerca para acompañar todo el día.',
+    destacado: true,
   },
   {
     icono: Flame,
-    titulo: 'Quincho Equipado',
-    descripcion: 'Quincho completo con parrilla, mesas y zona cubierta para 30 personas',
+    titulo: 'Quincho y parrilla',
+    descripcion: 'Un espacio cubierto para servir, comer y seguir la reunión aunque cambie el clima.',
+    destacado: true,
   },
   {
-    icono: Wifi,
-    titulo: 'WiFi Gratis',
-    descripcion: 'Internet de alta velocidad en toda la propiedad',
+    icono: Microwave,
+    titulo: 'Horno de barro',
+    descripcion: 'Para sumar pizzas, panes o una cocción lenta al plan del encuentro.',
+    destacado: false,
+  },
+  {
+    icono: Refrigerator,
+    titulo: 'Heladera con freezer',
+    descripcion: 'Capacidad para organizar bebidas y comida sin depender de conservadoras.',
+    destacado: false,
   },
   {
     icono: Car,
-    titulo: 'Estacionamiento',
-    descripcion: 'Amplio espacio para estacionar varios vehículos dentro de la quinta',
+    titulo: 'Estacionamiento interno',
+    descripcion: 'Lugar para varios vehículos dentro del predio.',
+    destacado: false,
   },
   {
-    icono: Users,
-    titulo: 'Hasta 30 Personas',
-    descripcion: 'Capacidad para grupos grandes con múltiples espacios',
+    icono: Wifi,
+    titulo: 'WiFi',
+    descripcion: 'Conectividad disponible en la propiedad para resolver lo necesario.',
+    destacado: false,
   },
-];
+] as const;
 
 export function Servicios() {
   return (
-    <section id="servicios" className="py-16 sm:py-20 lg:py-24 bg-crema">
+    <section id="servicios" className="services section-shell" aria-labelledby="services-title">
       <div className="section-container">
-        {/* Header de la sección */}
-        <div className="text-center mb-12 sm:mb-16">
-          <span className="section-label">Servicios</span>
-          <h2 className="section-title mb-4">Todo para tu estadía</h2>
-          <p className="text-negro/70 text-base sm:text-lg max-w-2xl mx-auto">
-            Contamos con todas las comodidades para que tu experiencia sea inolvidable
-          </p>
+        <div className="services__heading">
+          <SectionIntro
+            align="left"
+            eyebrow="02 · Lo que ya está resuelto"
+            title={<span id="services-title">Menos logística. Más encuentro.</span>}
+            description="Los espacios y equipamientos que sostienen una jornada de hasta 30 personas, sin sumar traslados ni proveedores para lo esencial."
+          />
+          <div className="services__capacity" aria-label="Capacidad máxima: 30 personas">
+            <Users aria-hidden="true" />
+            <span>
+              <strong>30</strong>
+              personas como máximo
+            </span>
+          </div>
         </div>
 
-        {/* Grid de servicios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {SERVICIOS.map((servicio, index) => (
-            <ServicioCard
-              key={index}
-              icono={servicio.icono}
-              titulo={servicio.titulo}
-              descripcion={servicio.descripcion}
-            />
+        <ul className="services__grid">
+          {SERVICIOS.map(({ icono: Icono, titulo, descripcion, destacado }) => (
+            <li className={`service-card${destacado ? ' service-card--featured' : ''}`} key={titulo}>
+              <span className="service-card__icon" aria-hidden="true">
+                <Icono />
+              </span>
+              <div>
+                <h3>{titulo}</h3>
+                <p>{descripcion}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENTE CARD DE SERVICIO
-// ─────────────────────────────────────────────────────────────────────────────
-interface ServicioCardProps {
-  icono: React.ElementType;
-  titulo: string;
-  descripcion: string;
-}
-
-function ServicioCard({ icono: Icono, titulo, descripcion }: ServicioCardProps) {
-  return (
-    <div className="servicio-card">
-      {/* Línea decorativa superior (aparece en hover) */}
-      <div className="servicio-card-line" />
-
-      {/* Contenido */}
-      <div className="p-6 sm:p-8">
-        {/* Icono */}
-        <div className="servicio-icon">
-          <Icono className="w-6 h-6 text-oliva" strokeWidth={1.5} />
-        </div>
-
-        {/* Texto */}
-        <h3 className="font-serif text-lg sm:text-xl text-negro mb-2">{titulo}</h3>
-        <p className="text-negro/60 text-sm sm:text-base leading-relaxed">{descripcion}</p>
-      </div>
-    </div>
   );
 }

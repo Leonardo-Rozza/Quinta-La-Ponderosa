@@ -2,190 +2,176 @@
 
 import { CONFIG, NAV_LINKS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowUpRight, Leaf, Menu, X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const headerInnerRef = useRef<HTMLDivElement>(null);
 
-  // Detectar scroll
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Bloquear scroll del body cuando el menú está abierto
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    if (!isMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const menuButton = menuButtonRef.current;
+    const backgroundElements = [
+      headerInnerRef.current,
+      ...Array.from(document.querySelectorAll<HTMLElement>('main, footer, .skip-link, .whatsapp-contact')),
+    ].filter((element): element is HTMLElement => Boolean(element));
+    const previousInert = backgroundElements.map((element) => element.hasAttribute('inert'));
+
+    document.body.style.overflow = 'hidden';
+    backgroundElements.forEach((element) => element.setAttribute('inert', ''));
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusables = mobileMenuRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables?.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      backgroundElements.forEach((element, index) => {
+        if (!previousInert[index]) element.removeAttribute('inert');
+      });
+      window.removeEventListener('keydown', handleKeyDown);
+      menuButton?.focus();
+    };
   }, [isMenuOpen]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // FUNCIÓN PARA SCROLL SUAVE A UNA SECCIÓN
-  // ─────────────────────────────────────────────────────────────────────────
-  const scrollToSection = (sectionId: string) => {
-    // Cerrar menú móvil si está abierto
-    setIsMenuOpen(false);
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 64.0625rem)');
+    const closeAtDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setIsMenuOpen(false);
+    };
+    desktopQuery.addEventListener('change', closeAtDesktop);
+    return () => desktopQuery.removeEventListener('change', closeAtDesktop);
+  }, []);
 
-    // Pequeño delay para que el menú se cierre primero
-    setTimeout(() => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    }, 100);
-  };
+  useEffect(() => {
+    const closeOnNavigation = () => setIsMenuOpen(false);
+    window.addEventListener('hashchange', closeOnNavigation);
+    window.addEventListener('popstate', closeOnNavigation);
+    return () => {
+      window.removeEventListener('hashchange', closeOnNavigation);
+      window.removeEventListener('popstate', closeOnNavigation);
+    };
+  }, []);
+
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <>
-      {/* Navbar principal */}
-      <nav
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50',
-          'transition-all duration-300',
-          !isScrolled && 'bg-transparent',
-          isScrolled && 'bg-crema/95 backdrop-blur-md shadow-sm'
-        )}
-      >
-        <div className="section-container flex justify-between items-center h-16 md:h-20">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-2 z-10"
-          >
-            <div
-              className={cn(
-                'w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center',
-                'transition-colors duration-300',
-                !isScrolled ? 'bg-white/20' : 'bg-oliva'
-              )}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-5 h-5 md:w-6 md:h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M12 3c-1.5 3-3 5.5-3 9 0 4 2 6 3 6s3-2 3-6c0-3.5-1.5-6-3-9z" />
-                <path d="M12 12v9" />
-              </svg>
-            </div>
-            <span
-              className={cn(
-                'font-serif text-lg md:text-xl',
-                'transition-colors duration-300',
-                !isScrolled ? 'text-white' : 'text-negro'
-              )}
-            >
-              {CONFIG.siteName}
-            </span>
-          </button>
+    <header className={cn('site-header', isScrolled && 'site-header--scrolled')}>
+      <div ref={headerInnerRef} className="section-container site-header__inner" aria-hidden={isMenuOpen || undefined}>
+        <Link href="/#inicio" className="brand" aria-label="La Ponderosa, volver al inicio">
+          <span className="brand__mark" aria-hidden="true">
+            <Leaf />
+          </span>
+          <span className="brand__name">{CONFIG.siteName}</span>
+        </Link>
 
-          {/* Links desktop */}
-          <ul className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
+        <nav className="desktop-nav" aria-label="Navegación principal">
+          <ul>
+            {NAV_LINKS.slice(0, 4).map((link) => (
               <li key={link.href}>
-                <button
-                  onClick={() => scrollToSection(link.href.replace('#', ''))}
-                  className={cn(
-                    'text-sm font-medium transition-colors duration-300 hover-line',
-                    !isScrolled
-                      ? 'text-white/90 hover:text-white'
-                      : 'text-negro/80 hover:text-negro'
-                  )}
-                >
-                  {link.label}
-                </button>
+                <Link href={`/${link.href}`}>{link.label}</Link>
               </li>
             ))}
           </ul>
+        </nav>
 
-          {/* Botón CTA desktop */}
-          <button
-            onClick={() => scrollToSection('reservas')}
-            className={cn('hidden md:inline-flex btn-oliva py-2.5 px-5')}
-          >
-            Reservar Ahora
-          </button>
+        <Link href="/#reservas" className="button button--header">
+          Reservar
+          <ArrowUpRight aria-hidden="true" />
+        </Link>
 
-          {/* Botón hamburguesa móvil */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={cn(
-              'md:hidden z-10 w-10 h-10 flex items-center justify-center rounded-full',
-              'transition-colors duration-300',
-              !isScrolled && !isMenuOpen && 'text-white',
-              isScrolled && !isMenuOpen && 'text-negro',
-              isMenuOpen && 'text-negro'
-            )}
-            aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </nav>
+        <button
+          ref={menuButtonRef}
+          type="button"
+          className="menu-toggle"
+          onClick={() => setIsMenuOpen(true)}
+          aria-expanded={isMenuOpen}
+          aria-controls="menu-movil"
+          aria-label="Abrir menú"
+        >
+          <Menu aria-hidden="true" />
+        </button>
+      </div>
 
-      {/* Menú móvil overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-crema transition-all duration-300',
-          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        )}
-      >
-        <div className="flex flex-col items-center justify-center h-full px-4">
-          <ul className="flex flex-col items-center gap-6 mb-8">
-            {NAV_LINKS.map((link, index) => (
-              <li
-                key={link.href}
-                style={{ transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms' }}
-                className={cn(
-                  'transition-all duration-300',
-                  isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                )}
-              >
-                <button
-                  onClick={() => scrollToSection(link.href.replace('#', ''))}
-                  className="font-serif text-3xl text-negro hover:text-terracota transition-colors"
-                >
-                  {link.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <div
-            style={{ transitionDelay: isMenuOpen ? '200ms' : '0ms' }}
-            className={cn(
-              'transition-all duration-300',
-              isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            )}
-          >
-            <button onClick={() => scrollToSection('reservas')} className="btn-primary">
-              Reservar Ahora
+      {isMenuOpen ? (
+        <div ref={mobileMenuRef} id="menu-movil" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Menú">
+          <div className="mobile-menu__top">
+            <span className="brand brand--dark" aria-hidden="true">
+              <span className="brand__mark">
+                <Leaf />
+              </span>
+              <span className="brand__name">{CONFIG.siteName}</span>
+            </span>
+            <button
+              ref={closeButtonRef}
+              type="button"
+              className="menu-toggle menu-toggle--close"
+              onClick={closeMenu}
+              aria-label="Cerrar menú"
+            >
+              <X aria-hidden="true" />
             </button>
           </div>
 
-          <div
-            style={{ transitionDelay: isMenuOpen ? '250ms' : '0ms' }}
-            className={cn(
-              'mt-12 text-center transition-all duration-300',
-              isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            )}
-          >
-            <p className="text-negro/60 text-sm mb-2">{CONFIG.direccion}</p>
-            <a
-              href={`tel:${CONFIG.telefono}`}
-              className="text-terracota font-medium hover:underline"
-            >
-              {CONFIG.telefonoDisplay}
-            </a>
+          <nav className="mobile-nav" aria-label="Navegación móvil">
+            <ol>
+              {NAV_LINKS.map((link, index) => (
+                <li key={link.href}>
+                  <span aria-hidden="true">0{index + 1}</span>
+                  <Link href={`/${link.href}`} onClick={closeMenu}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
+          <div className="mobile-menu__footer">
+            <p>{CONFIG.direccion}</p>
+            <Link href="/#reservas" className="button button--primary button--large" onClick={closeMenu}>
+              Ver disponibilidad
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
           </div>
         </div>
-      </div>
-    </>
+      ) : null}
+    </header>
   );
 }
