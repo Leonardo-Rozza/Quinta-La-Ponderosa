@@ -31,8 +31,8 @@ const MOMENTOS = [
 
 export function Jornada() {
   return (
-    <section id="experiencia" className="jornada section-shell" aria-labelledby="jornada-title">
-      <div className="section-container">
+    <section className="jornada section-shell" aria-labelledby="jornada-title">
+      <div id="experiencia" className="section-container">
         <div className="jornada__intro-grid">
           <SectionIntro
             align="left"

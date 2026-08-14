@@ -8,8 +8,8 @@ const MAPS_URL =
 
 export function Ubicacion() {
   return (
-    <section id="ubicacion" className="location section-shell" aria-labelledby="location-title">
-      <div className="section-container">
+    <section className="location section-shell" aria-labelledby="location-title">
+      <div id="ubicacion" className="section-container">
         <SectionIntro
           eyebrow="05 · Llegar sin vueltas"
           title={<span id="location-title">En José C. Paz, cerca de todo el plan.</span>}

@@ -189,8 +189,8 @@ export function Reservas() {
   };
 
   return (
-    <section id="reservas" className="booking section-shell" aria-labelledby="booking-title">
-      <div className="section-container booking__container">
+    <section className="booking section-shell" aria-labelledby="booking-title">
+      <div id="reservas" className="section-container booking__container">
         <SectionIntro
           eyebrow="04 · Reservar la jornada"
           title={<span id="booking-title">Tres pasos. Una fecha para encontrarse.</span>}

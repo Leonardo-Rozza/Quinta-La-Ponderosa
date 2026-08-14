@@ -42,8 +42,8 @@ const SERVICIOS = [
 
 export function Servicios() {
   return (
-    <section id="servicios" className="services section-shell" aria-labelledby="services-title">
-      <div className="section-container">
+    <section className="services section-shell" aria-labelledby="services-title">
+      <div id="servicios" className="section-container">
         <div className="services__heading">
           <SectionIntro
             align="left"

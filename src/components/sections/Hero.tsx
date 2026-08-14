@@ -45,28 +45,30 @@ export function Hero() {
           </Link>
         </div>
 
-        <div className="hero__facts" aria-label="Datos principales de la quinta">
-          <div>
-            <span className="hero__fact-icon" aria-hidden="true">
-              <Users />
-            </span>
-            <p>
-              <strong>Hasta {PRECIOS.maximoPersonas}</strong>
-              <span>personas</span>
-            </p>
+        <div className="hero__meta">
+          <div className="hero__facts" aria-label="Datos principales de la quinta">
+            <div>
+              <span className="hero__fact-icon" aria-hidden="true">
+                <Users />
+              </span>
+              <p>
+                <strong>Hasta {PRECIOS.maximoPersonas}</strong>
+                <span>personas</span>
+              </p>
+            </div>
+            <div>
+              <span className="hero__fact-mark" aria-hidden="true" />
+              <p>
+                <strong>Uso exclusivo</strong>
+                <span>sin compartir espacios</span>
+              </p>
+            </div>
           </div>
-          <div>
-            <span className="hero__fact-mark" aria-hidden="true" />
-            <p>
-              <strong>Uso exclusivo</strong>
-              <span>sin compartir espacios</span>
-            </p>
+
+          <div className="hero__dayline">
+            <Dayline compact inverse />
           </div>
         </div>
-      </div>
-
-      <div className="hero__dayline">
-        <Dayline compact inverse />
       </div>
     </section>
   );

@@ -28,5 +28,7 @@ export function formatearPrecio(precio: number): string {
  */
 export function generarLinkWhatsApp(mensajeCustom?: string): string {
   const mensaje = mensajeCustom || CONFIG.whatsappMessage;
-  return `https://wa.me/${CONFIG.telefono}?text=${encodeURIComponent(mensaje)}`;
+  const telefono = CONFIG.telefono.replace(/\D/g, '');
+
+  return `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
 }

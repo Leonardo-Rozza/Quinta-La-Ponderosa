@@ -3,7 +3,7 @@
 import { ArrowDownRight, ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { KeyboardEvent, SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { KeyboardEvent, PointerEvent, SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { SectionIntro } from './shared/SectionIntro';
 
 const IMAGENES = [
@@ -44,6 +44,7 @@ export function Galeria() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
+  const backdropPointerIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -66,8 +67,42 @@ export function Galeria() {
     cerrarVisor();
   };
   const completarCierre = () => {
+    backdropPointerIdRef.current = null;
     setImagenActiva(null);
     requestAnimationFrame(() => openerRef.current?.focus());
+  };
+  const estaFueraDelDialogo = (event: PointerEvent<HTMLDialogElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    return (
+      event.clientX < rect.left
+      || event.clientX > rect.right
+      || event.clientY < rect.top
+      || event.clientY > rect.bottom
+    );
+  };
+  const iniciarCierreDesdeBackdrop = (event: PointerEvent<HTMLDialogElement>) => {
+    backdropPointerIdRef.current = event.isPrimary
+      && event.button === 0
+      && estaFueraDelDialogo(event)
+      ? event.pointerId
+      : null;
+  };
+  const completarCierreDesdeBackdrop = (event: PointerEvent<HTMLDialogElement>) => {
+    const empezoFuera = backdropPointerIdRef.current === event.pointerId;
+    backdropPointerIdRef.current = null;
+
+    if (
+      empezoFuera
+      && event.isPrimary
+      && event.button === 0
+      && estaFueraDelDialogo(event)
+    ) {
+      cerrarVisor();
+    }
+  };
+  const cancelarCierreDesdeBackdrop = () => {
+    backdropPointerIdRef.current = null;
   };
   const moverImagen = (direccion: -1 | 1) => {
     setImagenActiva((actual) => {
@@ -92,8 +127,8 @@ export function Galeria() {
   };
 
   return (
-    <section id="galeria" className="gallery section-shell" aria-labelledby="gallery-title">
-      <div className="section-container">
+    <section className="gallery section-shell" aria-labelledby="gallery-title">
+      <div id="galeria" className="section-container">
         <div className="gallery__heading">
           <SectionIntro
             align="left"
@@ -145,6 +180,9 @@ export function Galeria() {
           onClose={completarCierre}
           onCancel={cancelarVisor}
           onKeyDown={manejarTeclado}
+          onPointerDown={iniciarCierreDesdeBackdrop}
+          onPointerUp={completarCierreDesdeBackdrop}
+          onPointerCancel={cancelarCierreDesdeBackdrop}
           aria-labelledby="gallery-viewer-title"
         >
           {imagenActiva !== null ? (
@@ -174,7 +212,6 @@ export function Galeria() {
                 <button type="button" onClick={() => moverImagen(-1)}>
                   <ChevronLeft aria-hidden="true" /> Anterior
                 </button>
-                <span>También podés usar las flechas del teclado</span>
                 <button type="button" onClick={() => moverImagen(1)}>
                   Siguiente <ChevronRight aria-hidden="true" />
                 </button>
