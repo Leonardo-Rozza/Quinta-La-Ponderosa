@@ -2,6 +2,7 @@
 
 import { useCalendario } from '@/hooks/useCalendario';
 import { PRECIOS } from '@/lib/constants';
+import { consultarDisponibilidad } from '@/lib/reservas/availability-client';
 import { formatearPrecio } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -56,6 +57,7 @@ export function Reservas() {
   const [maxAdvanceDays, setMaxAdvanceDays] = useState(0);
   const [estadoDisponibilidad, setEstadoDisponibilidad] = useState<EstadoDisponibilidad>('loading');
   const [errorDisponibilidad, setErrorDisponibilidad] = useState('');
+  const [puedeReintentarDisponibilidad, setPuedeReintentarDisponibilidad] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bookingRequest = useRef<{ id: string; fingerprint: string } | null>(null);
@@ -69,36 +71,24 @@ export function Reservas() {
     if (signal?.aborted) return;
     setEstadoDisponibilidad('loading');
     setErrorDisponibilidad('');
+    setPuedeReintentarDisponibilidad(false);
 
-    try {
-      const response = await fetch('/api/reservas', { cache: 'no-store', signal });
-      const data = (await response.json().catch(() => null)) as
-        | { fechasOcupadas?: string[]; maxAdvanceDays?: number; warning?: string; error?: { code?: string; message?: string; retryable?: boolean } }
-        | null;
-
-      if (!response.ok || !data) {
-        throw new Error(data?.error?.message || 'No pudimos consultar las fechas.');
-      }
-
-      if (data.warning) {
-        throw new Error('La disponibilidad online está temporalmente incompleta.');
-      }
-
-      if (!Array.isArray(data.fechasOcupadas) || !Number.isInteger(data.maxAdvanceDays) || (data.maxAdvanceDays ?? 0) < 1) {
-        throw new Error('La respuesta de disponibilidad no es válida.');
-      }
-
-      setFechasOcupadas(data.fechasOcupadas.map((fecha) => new Date(`${fecha}T12:00:00`)));
-      setMaxAdvanceDays(data.maxAdvanceDays as number);
-      setEstadoDisponibilidad('ready');
-    } catch (fetchError) {
-      if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return;
-      console.error('Error cargando disponibilidad:', fetchError);
+    const resultado = await consultarDisponibilidad({ signal });
+    if (!resultado.ok) {
+      if (resultado.error.type === 'aborted') return;
+      setFechasOcupadas([]);
+      setMaxAdvanceDays(0);
       setEstadoDisponibilidad('error');
-      setErrorDisponibilidad(
-        fetchError instanceof Error ? fetchError.message : 'No pudimos consultar las fechas.'
-      );
+      setErrorDisponibilidad(resultado.error.message);
+      setPuedeReintentarDisponibilidad(resultado.error.retryable);
+      return;
     }
+
+    setFechasOcupadas(
+      resultado.value.fechasOcupadas.map((fecha) => new Date(`${fecha}T12:00:00`)),
+    );
+    setMaxAdvanceDays(resultado.value.maxAdvanceDays);
+    setEstadoDisponibilidad('ready');
   }, []);
 
   useEffect(() => {
@@ -250,10 +240,12 @@ export function Reservas() {
                 <AlertTriangle aria-hidden="true" />
                 <h3>No podemos confirmar fechas ahora</h3>
                 <p>{errorDisponibilidad} Para evitar superposiciones, pausamos la selección.</p>
-                <button type="button" className="button button--secondary" onClick={() => void cargarFechasOcupadas()}>
-                  <RefreshCw aria-hidden="true" />
-                  Volver a intentar
-                </button>
+                {puedeReintentarDisponibilidad ? (
+                  <button type="button" className="button button--secondary" onClick={() => void cargarFechasOcupadas()}>
+                    <RefreshCw aria-hidden="true" />
+                    Volver a intentar
+                  </button>
+                ) : null}
               </div>
             ) : (
               <Calendario
