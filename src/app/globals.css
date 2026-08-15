@@ -1098,10 +1098,13 @@ img {
 }
 
 .gallery-viewer {
+  position: fixed;
+  inset: 0;
   width: min(74rem, calc(100% - 2rem));
   max-width: none;
   height: min(52rem, calc(100dvh - 2rem));
   max-height: none;
+  margin: auto;
   padding: 0;
   color: var(--bone);
   background: #13231d;
