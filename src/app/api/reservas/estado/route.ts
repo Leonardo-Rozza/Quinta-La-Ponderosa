@@ -3,6 +3,7 @@ import {
   MercadoPagoIntegrationError,
   validarTokenEstadoReserva,
 } from '@/lib/mercado-pago';
+import { reservasOnlineHabilitadas } from '@/lib/reservas/online-config';
 import { getSupabaseAdmin, hasSupabaseAdminConfig, type Reserva } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -71,6 +72,7 @@ export async function GET(request: NextRequest) {
       | 'checkout_url'
     >;
     const canRetryCheckout =
+      reservasOnlineHabilitadas() &&
       reserva.estado === 'pendiente' &&
       !reserva.requiere_revision &&
       new Date(reserva.hold_expires_at).getTime() > Date.now() &&

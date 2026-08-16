@@ -14,6 +14,7 @@ import {
   hashRateLimitSignal,
 } from '@/lib/rate-limit';
 import { getConfiguredReservaMaxAdvanceDays } from '@/lib/reservas';
+import { reservasOnlineHabilitadas } from '@/lib/reservas/online-config';
 import { getSupabaseAdmin, hasSupabaseAdminConfig, type Reserva } from '@/lib/supabase';
 import { reservaInputSchema, type ReservaInput } from '@/lib/validations';
 import { NextRequest, NextResponse } from 'next/server';
@@ -235,6 +236,14 @@ async function ensurePreference(reserva: Reserva, input: ReservaInput, replayed:
 
 export async function POST(request: NextRequest) {
   try {
+    if (!reservasOnlineHabilitadas()) {
+      return apiError(
+        'CONFIGURATION_ERROR',
+        'Las reservas online están pausadas temporalmente. Consultanos por WhatsApp.',
+        503,
+      );
+    }
+
     if (!hasJsonContentType(request)) {
       return apiError(
         'VALIDATION_ERROR',

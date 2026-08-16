@@ -3,10 +3,10 @@
 import { useCalendario } from '@/hooks/useCalendario';
 import { PRECIOS } from '@/lib/constants';
 import { consultarDisponibilidad } from '@/lib/reservas/availability-client';
-import { formatearPrecio } from '@/lib/utils';
+import { formatearPrecio, generarLinkWhatsApp } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { AlertTriangle, ArrowRight, CalendarDays, Check, Clock3, Loader2, RefreshCw, ShieldCheck, Users } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CalendarDays, Check, Clock3, Loader2, MessageCircle, RefreshCw, ShieldCheck, Users } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SectionIntro } from '../shared/SectionIntro';
 import { Calendario } from './Calendario';
@@ -14,6 +14,10 @@ import { DatosReserva, FormReserva } from './FormReserva';
 
 type Paso = 1 | 2 | 3;
 type EstadoDisponibilidad = 'loading' | 'ready' | 'error';
+
+interface ReservasProps {
+  onlineEnabled: boolean;
+}
 
 const PASOS = [
   { numero: 1, titulo: 'Elegí el día', detalle: 'Disponibilidad real' },
@@ -51,7 +55,7 @@ function esCheckoutMercadoPago(urlValue: string) {
   }
 }
 
-export function Reservas() {
+export function Reservas({ onlineEnabled }: ReservasProps) {
   const [pasoActivo, setPasoActivo] = useState<Paso>(1);
   const [fechasOcupadas, setFechasOcupadas] = useState<Date[]>([]);
   const [maxAdvanceDays, setMaxAdvanceDays] = useState(0);
@@ -115,8 +119,14 @@ export function Reservas() {
   const fechaLabel = calendario.fechaSeleccionada
     ? format(calendario.fechaSeleccionada, "EEEE d 'de' MMMM 'de' yyyy", { locale: es })
     : '';
+  const whatsappConsulta = generarLinkWhatsApp(
+    fechaLabel
+      ? `Hola! Quiero consultar la disponibilidad para el ${fechaLabel} en La Ponderosa.`
+      : 'Hola! Quiero consultar una fecha disponible en La Ponderosa.',
+  );
 
   const avanzarADatos = () => {
+    if (!onlineEnabled) return;
     if (!calendario.fechaSeleccionada) {
       setError('Elegí una fecha disponible para continuar.');
       return;
@@ -126,7 +136,7 @@ export function Reservas() {
   };
 
   const handleSubmit = async (datos: DatosReserva) => {
-    if (!calendario.fechaSeleccionada || isLoading) return;
+    if (!onlineEnabled || !calendario.fechaSeleccionada || isLoading) return;
 
     setIsLoading(true);
     setError(null);
@@ -192,31 +202,63 @@ export function Reservas() {
     <section className="booking section-shell" aria-labelledby="booking-title">
       <div id="reservas" className="section-container booking__container">
         <SectionIntro
-          eyebrow="04 · Reservar la jornada"
-          title={<span id="booking-title">Tres pasos. Una fecha para encontrarse.</span>}
-          description="Consultá disponibilidad en tiempo real, dejá tus datos y pagá sólo la seña desde el entorno seguro de Mercado Pago."
+          eyebrow={onlineEnabled ? '04 · Reservar la jornada' : '04 · Consultar disponibilidad'}
+          title={
+            <span id="booking-title">
+              {onlineEnabled
+                ? 'Tres pasos. Una fecha para encontrarse.'
+                : 'Elegí una fecha y conversemos.'}
+            </span>
+          }
+          description={
+            onlineEnabled
+              ? 'Consultá disponibilidad en tiempo real, dejá tus datos y pagá sólo la seña desde el entorno seguro de Mercado Pago.'
+              : 'Revisá el calendario actualizado y escribinos por WhatsApp para coordinar tu jornada.'
+          }
         />
 
-        <ol className="booking-steps" aria-label="Pasos de la reserva">
-          {PASOS.map((paso) => {
-            const completo = paso.numero < pasoActivo;
-            const habilitado = paso.numero <= pasoActivo && (paso.numero === 1 || calendario.fechaSeleccionada);
-            return (
-              <li className={paso.numero === pasoActivo ? 'booking-step--active' : completo ? 'booking-step--complete' : ''} key={paso.numero}>
-                <button
-                  type="button"
-                  onClick={() => habilitado && setPasoActivo(paso.numero as Paso)}
-                  disabled={!habilitado}
-                  aria-current={paso.numero === pasoActivo ? 'step' : undefined}
-                >
-                  <span className="booking-step__number" aria-hidden="true">{completo ? <Check /> : paso.numero}</span>
-                  <span><strong>{paso.titulo}</strong><small>{paso.detalle}</small></span>
-                </button>
-                {paso.numero < 3 ? <i aria-hidden="true" /> : null}
-              </li>
-            );
-          })}
-        </ol>
+        {!onlineEnabled ? (
+          <aside className="booking-demo-notice" aria-labelledby="booking-demo-title">
+            <MessageCircle aria-hidden="true" />
+            <div>
+              <strong id="booking-demo-title">Reservas online próximamente</strong>
+              <p>
+                Las señas y los pagos están pausados temporalmente. El calendario sigue disponible
+                para que nos indiques qué día te interesa.
+              </p>
+            </div>
+            <a
+              href={whatsappConsulta}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Consultar por WhatsApp
+            </a>
+          </aside>
+        ) : null}
+
+        {onlineEnabled ? (
+          <ol className="booking-steps" aria-label="Pasos de la reserva">
+            {PASOS.map((paso) => {
+              const completo = paso.numero < pasoActivo;
+              const habilitado = paso.numero <= pasoActivo && (paso.numero === 1 || calendario.fechaSeleccionada);
+              return (
+                <li className={paso.numero === pasoActivo ? 'booking-step--active' : completo ? 'booking-step--complete' : ''} key={paso.numero}>
+                  <button
+                    type="button"
+                    onClick={() => habilitado && setPasoActivo(paso.numero as Paso)}
+                    disabled={!habilitado}
+                    aria-current={paso.numero === pasoActivo ? 'step' : undefined}
+                  >
+                    <span className="booking-step__number" aria-hidden="true">{completo ? <Check /> : paso.numero}</span>
+                    <span><strong>{paso.titulo}</strong><small>{paso.detalle}</small></span>
+                  </button>
+                  {paso.numero < 3 ? <i aria-hidden="true" /> : null}
+                </li>
+              );
+            })}
+          </ol>
+        ) : null}
 
         {error ? (
           <div className="booking-alert booking-alert--error" role="alert" tabIndex={-1} ref={errorRef}>
@@ -283,28 +325,42 @@ export function Reservas() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="button button--primary button--large booking-stage__continue"
-              onClick={avanzarADatos}
-              disabled={!calendario.fechaSeleccionada || estadoDisponibilidad !== 'ready'}
-            >
-              Continuar con esta fecha
-              <ArrowRight aria-hidden="true" />
-            </button>
+            {onlineEnabled ? (
+              <button
+                type="button"
+                className="button button--primary button--large booking-stage__continue"
+                onClick={avanzarADatos}
+                disabled={!calendario.fechaSeleccionada || estadoDisponibilidad !== 'ready'}
+              >
+                Continuar con esta fecha
+                <ArrowRight aria-hidden="true" />
+              </button>
+            ) : (
+              <a
+                className="button button--large booking-stage__continue booking-stage__whatsapp"
+                href={whatsappConsulta}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle aria-hidden="true" />
+                {fechaLabel ? 'Consultar esta fecha' : 'Consultar por WhatsApp'}
+              </a>
+            )}
           </aside>
         </div>
 
-        <div hidden={pasoActivo === 1}>
-          <FormReserva
-            activeStep={pasoActivo === 3 ? 3 : 2}
-            fechaLabel={fechaLabel}
-            isLoading={isLoading}
-            onBack={() => setPasoActivo(pasoActivo === 3 ? 2 : 1)}
-            onReview={() => setPasoActivo(3)}
-            onSubmit={handleSubmit}
-          />
-        </div>
+        {onlineEnabled ? (
+          <div hidden={pasoActivo === 1}>
+            <FormReserva
+              activeStep={pasoActivo === 3 ? 3 : 2}
+              fechaLabel={fechaLabel}
+              isLoading={isLoading}
+              onBack={() => setPasoActivo(pasoActivo === 3 ? 2 : 1)}
+              onReview={() => setPasoActivo(3)}
+              onSubmit={handleSubmit}
+            />
+          </div>
+        ) : null}
       </div>
     </section>
   );

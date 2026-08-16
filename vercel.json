@@ -1,12 +1,3 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/procesar-notificaciones",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/limpiar-pendientes",
-      "schedule": "*/15 * * * *"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }

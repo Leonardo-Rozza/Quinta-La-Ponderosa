@@ -1411,6 +1411,18 @@ img {
   margin-top: 0.35rem;
 }
 
+.booking-stage__whatsapp {
+  color: white;
+  background: #0f7543;
+  border-color: #0f7543;
+}
+
+.booking-stage__whatsapp:hover {
+  color: white;
+  background: #0b6338;
+  border-color: #0b6338;
+}
+
 .calendar-card__header {
   display: flex;
   align-items: center;
@@ -1638,6 +1650,59 @@ img {
   border-radius: 50%;
   font-size: 1.3rem;
   cursor: pointer;
+}
+
+.booking-demo-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+  color: var(--forest-deep);
+  background: var(--water-pale);
+  border: 1px solid rgba(45, 112, 108, 0.24);
+  border-radius: 0.9rem;
+}
+
+.booking-demo-notice > svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--water);
+}
+
+.booking-demo-notice strong,
+.booking-demo-notice p {
+  margin: 0;
+}
+
+.booking-demo-notice p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.booking-demo-notice a {
+  min-height: 2.75rem;
+  padding: 0.72rem 1rem;
+  color: white;
+  background: #0f7543;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.booking-demo-notice a:hover {
+  background: #0b6338;
+}
+
+.booking-demo-notice a:focus-visible {
+  outline-color: #0a4c2b;
+}
+
+.booking-stage__whatsapp:focus-visible {
+  outline-color: var(--bone);
 }
 
 .booking-form {
@@ -2848,6 +2913,15 @@ img {
 
   .booking-stage__summary {
     display: block;
+  }
+
+  .booking-demo-notice {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .booking-demo-notice a {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .calendar-day {

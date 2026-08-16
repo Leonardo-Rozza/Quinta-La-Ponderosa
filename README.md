@@ -46,6 +46,7 @@ La UI estática puede renderizar sin proveedores externos. La disponibilidad y e
 | Supabase | `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Acceso administrativo sólo desde el servidor. La service role nunca se expone al navegador. |
 | Mercado Pago | `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`, `MP_COLLECTOR_ID`, `MP_LIVE_MODE` | Identidad del vendedor, ambiente y autenticación de eventos. |
 | Estado público | `RESERVA_STATUS_SECRET` | HMAC de las URLs acotadas de consulta/reintento. Usar al menos 32 bytes aleatorios. |
+| Modo operativo | `RESERVAS_ONLINE_ENABLED` | Habilita la creación de holds y checkouts. Mantener en `false` mientras no haya workers. |
 | Workers/abuso | `CRON_SECRET`, `RATE_LIMIT_SECRET` | Autenticación de crons y HMAC de señales de abuso. Usar al menos 32 bytes aleatorios. |
 | Email | `RESEND_API_KEY`, `EMAIL_FROM`, `OWNER_EMAIL` | Confirmaciones y alertas operativas. En deploy se validan antes de iniciar un checkout. |
 
@@ -68,7 +69,7 @@ Las cuatro tablas (`reservas`, `mp_webhook_events`, `email_outbox`, `api_rate_li
 ## Flujo de reservas y pagos
 
 1. `GET /api/reservas` devuelve sólo fechas ocupadas y el horizonte habilitado.
-2. `POST /api/reservas` exige JSON, valida origen y tamaño, normaliza los datos, consume límites independientes por IP y email, recalcula el precio y crea un hold idempotente.
+2. `POST /api/reservas` exige que el modo online esté habilitado, valida JSON, origen y tamaño, normaliza los datos, consume límites independientes por IP y email, recalcula el precio y crea un hold idempotente.
 3. El backend crea o recupera una preferencia expirable de Mercado Pago y liga reserva, preferencia, vendedor, ambiente, moneda y monto.
 4. Mercado Pago redirige a `/reserva/{confirmada,error,pendiente}`. Esas páginas consultan `GET /api/reservas/estado` con un token HMAC; el retorno del navegador nunca confirma un pago.
 5. `POST /api/webhook` verifica firma, antigüedad e igualdad exacta del recurso, preservando incluso IDs JSON mayores a `2^53`. El evento se persiste antes del ACK y se procesa de forma idempotente.
@@ -90,14 +91,46 @@ Mercado Pago recomienda Webhooks porque permiten validar la firma de origen; IPN
 
 ## Workers y requisito de hosting
 
-`vercel.json` agenda:
+**Estado temporal: deploy demostrativo en Vercel Hobby, sin pagos ni reservas
+reales.** `vercel.json` no agenda cron jobs para que el deploy sea compatible con
+Hobby. Además, `RESERVAS_ONLINE_ENABLED=false` mantiene bloqueada la creación de
+holds y checkouts desde el servidor y no expone enlaces de reintento de pago. Si
+la variable no existe, cualquier deploy también falla cerrado; sólo el desarrollo
+local queda habilitado por defecto.
+Los Route Handlers y su autenticación permanecen listos, pero no se ejecutan
+automáticamente.
+
+La configuración para Vercel Pro está preservada en
+[`vercel.pro.json.example`](vercel.pro.json.example) y agenda:
 
 - `GET /api/cron/procesar-notificaciones` cada 5 minutos.
 - `GET /api/cron/limpiar-pendientes` cada 15 minutos.
 
 Ambos endpoints exigen `Authorization: Bearer <CRON_SECRET>` y fallan cerrados si el secreto no está configurado.
 
-**El archivo actual requiere Vercel Pro o Enterprise.** Vercel Hobby sólo admite una ejecución diaria y rechaza durante el deploy expresiones más frecuentes. En Hobby hay que quitar el bloque `crons` de `vercel.json` y configurar un scheduler externo que respete esas frecuencias y envíe el mismo header `Authorization`. No reducir estos trabajos a una ejecución diaria: demoraría webhooks, emails y liberación de holds. Ver [límites de Cron Jobs](https://vercel.com/docs/cron-jobs/usage-and-pricing) y [autenticación con `CRON_SECRET`](https://vercel.com/docs/cron-jobs/manage-cron-jobs).
+Sin scheduler no se envían automáticamente los emails encolados, no se
+reintentan eventos fallidos y no se concilian ni liberan holds vencidos. Por eso
+este estado no es apto para cobros reales. Los endpoints pueden ejecutarse
+manualmente o desde un scheduler externo enviando el mismo header Bearer.
+
+Al pasar a Vercel Pro, hacer la activación en dos deploys. Primero mantener
+`RESERVAS_ONLINE_ENABLED=false`, restaurar la programación y redesplegar:
+
+```bash
+cp vercel.pro.json.example vercel.json
+```
+
+Verificar ambos jobs en **Project → Settings → Cron Jobs**, ejecutar manualmente
+los dos endpoints con su Bearer y completar el checklist de proveedores. Mantener
+el flag en `false` si alguna comprobación falla. Recién entonces establecer
+`RESERVAS_ONLINE_ENABLED=true` en Vercel y hacer un segundo deploy para habilitar
+reservas y pagos.
+
+No reducir los workers a una ejecución diaria: demoraría webhooks,
+emails y liberación de holds. Vercel Hobby sólo admite una ejecución diaria y
+rechaza durante el deploy expresiones más frecuentes. Ver [gestión y límites de
+Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs) y
+[autenticación con `CRON_SECRET`](https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs).
 
 ## Controles de seguridad relevantes
 
@@ -127,6 +160,7 @@ Ambos endpoints exigen `Authorization: Bearer <CRON_SECRET>` y fallan cerrados s
 - [ ] Compra sandbox aprobada, rechazada y pendiente; retorno y consulta de estado correctos.
 - [ ] Reintento idempotente de la misma reserva y bloqueo concurrente de la misma fecha.
 - [ ] Crons ejecutados con Bearer secret; inbox, outbox y conciliación sin filas estancadas.
+- [ ] `RESERVAS_ONLINE_ENABLED=true` sólo después de verificar ambos workers en el deploy anterior.
 - [ ] `npm run check`, `npm audit` y `npm run audit:prod` en verde.
 - [ ] Textos de términos y privacidad revisados por el responsable del negocio/asesor legal.
 - [ ] Recién entonces rotar a credenciales productivas y establecer `MP_LIVE_MODE=true`.

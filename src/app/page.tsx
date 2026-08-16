@@ -8,8 +8,11 @@ import { Preguntas } from '@/components/sections/Preguntas';
 import { Servicios } from '@/components/sections/Servicios';
 import { Ubicacion } from '@/components/sections/Ubicacion';
 import { Reservas } from '@/components/sections/reservas';
+import { reservasOnlineHabilitadas } from '@/lib/reservas/online-config';
 
 export default function HomePage() {
+  const reservasOnline = reservasOnlineHabilitadas();
+
   return (
     <>
       <Navbar />
@@ -18,7 +21,7 @@ export default function HomePage() {
         <Jornada />
         <Servicios />
         <Galeria />
-        <Reservas />
+        <Reservas onlineEnabled={reservasOnline} />
         <Ubicacion />
         <Preguntas />
       </main>
